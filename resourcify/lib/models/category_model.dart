@@ -1,33 +1,57 @@
+import 'package:dynamic_treeview/dynamic_treeview.dart';
 import 'package:equatable/equatable.dart';
 
-class Category extends Equatable {
+class Category extends Equatable implements BaseData {
   Category({
     this.id,
     this.name,
-    this.children,
     this.parentId,
+    this.extras,
   });
 
   final String id;
   final String name;
-  final List<Category> children;
+  final Map<String,dynamic> extras;
+
   final String parentId;
 
   factory Category.fromJson(Map<String, dynamic> json) => Category(
-        id: json["id"],
+        id: json["_id"],
         name: json["name"],
-        children: List<Category>.from(
-            json["children"].map((x) => Category.fromJson(x))),
-        parentId: json["parentId"] == null ? null : json["parentId"],
+        parentId: json["parentId"] == null ? '1' : json["parentId"],
+        extras: {'key':json["_id"]}
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
-        "children": List<dynamic>.from(children.map((x) => x.toJson())),
-        "parentId": parentId == null ? null : parentId,
+        "parentId": parentId
       };
 
   @override
-  List<Object> get props => [id, name, children, parentId];
+  List<Object> get props => [id, name, parentId];
+
+  // override for dynamic tree view
+  @override
+  Map<String, dynamic> getExtraData() {
+    return this.extras;
+  }
+
+  @override
+  String getId() {
+    // TODO: implement getId
+    return this.id;
+  }
+
+  @override
+  String getParentId() {
+    // TODO: implement getParentId
+    return this.parentId;
+  }
+
+  @override
+  String getTitle() {
+    // TODO: implement getTitle
+    return this.name;
+  }
 }
