@@ -25,3 +25,11 @@ class AdminCategoriesLoaded extends AdminState {
   AdminCategoriesLoaded(this.categories);
   List<Object> get props => [categories];
 }
+
+class AdminCategoryCreated extends AdminState {
+  final String message;
+
+  AdminCategoryCreated(this.message);
+  @override
+  List<Object> get props => [message];
+}

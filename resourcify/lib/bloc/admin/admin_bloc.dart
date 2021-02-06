@@ -28,6 +28,18 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       } catch (e) {
         yield AdminError(e.toString() ?? 'An unknown error occured');
       }
+    } else if (event is CreateCategory) {
+      try {
+        yield AdminLoading();
+        String message = await adminRepository.createCategory(event.category);
+        if (message != null) {
+          yield AdminCategoryCreated(message);
+        } else {
+          yield AdminError('Couldn\'t create category');
+        }
+      } catch (e) {
+        yield AdminError(e.toString() ?? 'An unknown error occured');
+      }
     }
   }
 }

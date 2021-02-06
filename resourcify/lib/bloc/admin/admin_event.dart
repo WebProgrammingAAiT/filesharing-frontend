@@ -10,3 +10,8 @@ abstract class AdminEvent extends Equatable {
 class GetCategories extends AdminEvent {
   const GetCategories();
 }
+
+class CreateCategory extends AdminEvent {
+  final Category category;
+  const CreateCategory(this.category);
+}
