@@ -11,7 +11,12 @@ class GetCategories extends AdminEvent {
   const GetCategories();
 }
 
-class CreateCategory extends AdminEvent {
+class CreateYearCategory extends AdminEvent {
   final Category category;
-  const CreateCategory(this.category);
+  const CreateYearCategory(this.category);
+}
+
+class UpdateYearCategory extends AdminEvent {
+  final Category category;
+  const UpdateYearCategory(this.category);
 }

@@ -6,7 +6,8 @@ import 'package:http/http.dart' as http;
 
 abstract class AdminRepository {
   Future<List<Category>> getCategories();
-  Future<String> createCategory(Category category);
+  Future<Category> createCategory(Category category);
+  Future<Category> updateCategory(Category category);
 }
 
 class AdminRepositoryImpl implements AdminRepository {
@@ -41,7 +42,7 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<String> createCategory(Category category) async {
+  Future<Category> createCategory(Category category) async {
     final storage = FlutterSecureStorage();
     String token = await storage.read(key: 'jwt');
 
@@ -56,7 +57,26 @@ class AdminRepositoryImpl implements AdminRepository {
           "type": category.type
         }));
     if (res.statusCode == 201) {
-      return json.decode(res.body)['message'];
+      return Category.fromJson(json.decode(res.body)['category']);
+    } else {
+      throw Exception(json.decode(res.body)['message']);
+    }
+  }
+
+  Future<Category> updateCategory(Category category) async {
+    final storage = FlutterSecureStorage();
+    String token = await storage.read(key: 'jwt');
+
+    var res = await http.put('$SERVER_IP/categories/${category.id}',
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode(<String, String>{
+          "name": category.name,
+        }));
+    if (res.statusCode == 200) {
+      return Category.fromJson(json.decode(res.body));
     } else {
       throw Exception(json.decode(res.body)['message']);
     }
