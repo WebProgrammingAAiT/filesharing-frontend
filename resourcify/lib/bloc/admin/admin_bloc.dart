@@ -28,6 +28,32 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       } catch (e) {
         yield AdminError(e.toString() ?? 'An unknown error occured');
       }
+    } else if (event is CreateYearCategory) {
+      try {
+        yield AdminLoading();
+        Category category =
+            await adminRepository.createCategory(event.category);
+        if (category != null) {
+          yield AdminYearCreated(category);
+        } else {
+          yield AdminError('Couldn\'t create category');
+        }
+      } catch (e) {
+        yield AdminError(e.toString() ?? 'An unknown error occured');
+      }
+    } else if (event is UpdateYearCategory) {
+      try {
+        yield AdminLoading();
+        Category category =
+            await adminRepository.updateCategory(event.category);
+        if (category != null) {
+          yield AdminYearUpdated(category);
+        } else {
+          yield AdminError('Couldn\'t update category');
+        }
+      } catch (e) {
+        yield AdminError(e.toString() ?? 'An unknown error occured');
+      }
     }
   }
 }
