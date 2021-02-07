@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:resourcify/Widgets/resource_list_widget.dart';
 import 'package:resourcify/bloc/auth_bloc.dart';
 import 'package:resourcify/screens/screens.dart';
 
@@ -20,18 +21,33 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       builder: (context, state) {
         if (state is AuthLoaded || state is AuthJwtLoaded) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text("This is user's home screen"),
-              actions: [
-                IconButton(
-                    icon: Icon(Icons.logout),
-                    onPressed: () {
-                      BlocProvider.of<AuthBloc>(context).add(RemoveJwt());
-                    })
-              ],
+        return Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            elevation: 1,
+            backgroundColor: Colors.white,
+            iconTheme: new IconThemeData(
+              color: Color(0xff3967D6),
             ),
-          );
+            title: Text(
+              "General Category",
+              style: TextStyle(color: Color(0xff3967D6)),
+            ),
+            actions: [
+              IconButton(
+                  icon: Icon(Icons.logout),
+                  onPressed: () {
+                    BlocProvider.of<AuthBloc>(context).add(RemoveJwt());
+                  })
+            ],
+          ),
+          body: ResourceList(),
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Color(0xff3967D6),
+            child: Icon(Icons.add),
+            onPressed: (){},
+          ),
+        );
         } else {
           return Scaffold(
             body: Center(

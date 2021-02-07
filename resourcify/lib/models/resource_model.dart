@@ -45,7 +45,7 @@ class Resource extends Equatable{
         uploadedBy: json['created_by'],
         isLiked: json['is_liked'] as bool,
         isDisliked: json['is_disliked'] as bool,
-        files: json['files'] as List<String>,
+        files: List<String>.from(json["files"]),
 
         );
   }
