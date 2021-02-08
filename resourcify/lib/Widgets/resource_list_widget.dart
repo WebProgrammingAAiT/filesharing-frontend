@@ -15,7 +15,7 @@ class ResourceListState extends State<ResourceList> {
 
   //User user;
   final ScrollController scrollController;
-  ResourceBloc resourceBloc = ResourceBloc(repo: ResourceRepository());
+  ResourceBloc resourceBloc = ResourceBloc(repo: ResourceRepositoryImpl());
   bool loading = false;
 
   @override
@@ -27,7 +27,7 @@ class ResourceListState extends State<ResourceList> {
 
   populateData() async {
 
-    resourceBloc.actionSink.add(FetchResources("prefs.getString('UserId')"));
+    resourceBloc.actionSink.add(FetchResources(""));
   }
 
   @override
@@ -49,8 +49,8 @@ class ResourceListState extends State<ResourceList> {
   }
 
   Future<void> refresh() async {
-    resourceBloc.actionSink.add(ReloadResources("prefs.getString('UserId')"));
-    resourceBloc.actionSink.add(FetchResources("prefs.getString('UserId')"));
+    resourceBloc.actionSink.add(ReloadResources(""));
+    resourceBloc.actionSink.add(FetchResources(""));
   }
 
   mainList(BuildContext context) {
