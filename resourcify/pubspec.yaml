@@ -29,6 +29,7 @@ dependencies:
   flutter_bloc: ^6.1.1
   flutter_secure_storage: ^3.3.5
   http: ^0.12.2
+  dynamic_treeview:
 
 dev_dependencies:
   flutter_test:
