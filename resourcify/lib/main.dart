@@ -8,6 +8,7 @@ import 'package:resourcify/screens/admin_home_screen.dart';
 import 'package:resourcify/screens/home_screen.dart';
 import 'package:resourcify/screens/screens.dart';
 
+import 'bloc/add_resource/add_resource_bloc.dart';
 import 'bloc/admin/admin_bloc.dart';
 import 'bloc/admin/admin_department/admin_department_bloc.dart';
 import 'bloc/admin/admin_subject/admin_subject_bloc.dart';
@@ -36,6 +37,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => ResourceBloc(ResourceRepositoryImpl()),
+          ),
+          BlocProvider(
+            create: (context) => AddResourceBloc(ResourceRepositoryImpl()),
           ),
         ],
         child: MaterialApp(

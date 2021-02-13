@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:multipart_request/multipart_request.dart';
 import 'package:resourcify/models/models.dart';
 import '../../repository/resource_repository.dart';
 import 'dart:async';
@@ -23,43 +20,6 @@ class ResourceBloc extends Bloc<ResourceEvent, ResourceState> {
         var categoryList = await resourceRepository.getCategories();
 
         yield ResourcesLoaded(resourceList, categoryList);
-      } catch (e) {
-        yield ResourceError(e.toString() ?? 'An unknown error occured');
-      }
-    } else if (event is CreateResource) {
-      try {
-        bool error = false;
-        bool complete = false;
-        int progress = 0;
-        dynamic json;
-        Response response = await resourceRepository.createResource(
-            filename: event.filename,
-            fileType: event.fileType,
-            filePath: event.filePath,
-            year: event.year,
-            department: event.department,
-            subject: event.subject);
-
-        response.onError = () async* {
-          error = true;
-        };
-
-        response.onComplete = (response) async* {
-          complete = true;
-          json = response;
-        };
-
-        response.progress.listen((int progress) async* {
-          progress = progress;
-        });
-
-        if (complete) {
-          yield (ResourceCreated(Resource.fromJson(json['resource'])));
-        } else if (error) {
-          yield ResourceError('An unknown error occured while posting');
-        } else {
-          yield ResourceCreating(progress);
-        }
       } catch (e) {
         yield ResourceError(e.toString() ?? 'An unknown error occured');
       }

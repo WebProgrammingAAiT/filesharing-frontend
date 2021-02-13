@@ -20,13 +20,4 @@ class ReloadResources extends ResourceEvent {
   ReloadResources(this.userId);
 }
 
-class CreateResource extends ResourceEvent {
-  final String filename;
-  final String filePath;
-  final String year;
-  final String department;
-  final String subject;
-  final String fileType;
-  CreateResource(this.filename, this.filePath, this.year, this.department,
-      this.subject, this.fileType);
-}
+

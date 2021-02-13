@@ -29,16 +29,3 @@ class ResourcesLoaded extends ResourceState {
   ResourcesLoaded(this.resources, this.categories);
   List<Object> get props => [resources, categories];
 }
-
-class ResourceCreated extends ResourceState {
-  final Resource resource;
-
-  ResourceCreated(this.resource);
-  @override
-  List<Object> get props => [resource];
-}
-
-class ResourceCreating extends ResourceState {
-  final int progress;
-  const ResourceCreating(this.progress);
-}

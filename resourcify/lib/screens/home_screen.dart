@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:resourcify/bloc/add_resource/add_resource_bloc.dart';
 import 'package:resourcify/bloc/auth_bloc.dart';
 import 'package:resourcify/bloc/resource/resource_bloc.dart';
 import 'package:resourcify/models/models.dart';
@@ -41,81 +42,93 @@ class _HomeScreenState extends State<HomeScreen> {
               })
         ],
       ),
-      body: BlocConsumer<ResourceBloc, ResourceState>(
+      body: BlocListener<AddResourceBloc, AddResourceState>(
         listener: (context, state) {
-          print(state);
-          if (state is ResourceError) {
+          if (state is ResourceCreated) {
             Scaffold.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),
+                content: Text('Resource uploaded succesfully'),
               ),
             );
+            context.read<ResourceBloc>().add(FetchResources(''));
           }
         },
-        builder: (context, state) {
-          if (state is ResourceInitial || state is ResourceLoading) {
-            return _buildCircularProgressIndicator();
-          } else if (state is ResourcesLoaded) {
-            categories = state.categories;
-            return RefreshIndicator(
-              onRefresh: onRefresh,
-              child: ListView(children: <Widget>[
-                Container(
-                    padding: EdgeInsets.all(5),
-                    margin: EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Text("All",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                  )),
-                              SizedBox(width: 5),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(".",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w900,
-                                        color: Color(0xff3967D6),
-                                      )),
-                                  SizedBox(height: 8)
-                                ],
-                              ),
-                              SizedBox(width: 2),
-                              Text("${state.resources.length}" + " results",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Color(0xff3967D6),
-                                  )),
-                            ],
+        child: BlocConsumer<ResourceBloc, ResourceState>(
+          listener: (context, state) {
+            print(state);
+            if (state is ResourceError) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is ResourceInitial || state is ResourceLoading) {
+              return _buildCircularProgressIndicator();
+            } else if (state is ResourcesLoaded) {
+              categories = state.categories;
+              return RefreshIndicator(
+                onRefresh: onRefresh,
+                child: ListView(children: <Widget>[
+                  Container(
+                      padding: EdgeInsets.all(5),
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(5),
+                            child: Row(
+                              children: [
+                                Text("All",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                    )),
+                                SizedBox(width: 5),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(".",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w900,
+                                          color: Color(0xff3967D6),
+                                        )),
+                                    SizedBox(height: 8)
+                                  ],
+                                ),
+                                SizedBox(width: 2),
+                                Text("${state.resources.length}" + " results",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xff3967D6),
+                                    )),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    )),
-                ListView.builder(
-                  primary: false,
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  scrollDirection: Axis.vertical,
-                  itemCount: state.resources.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ResourceWidget(
-                      resource: state.resources[index],
-                    );
-                  },
-                )
-              ]),
-            );
-          } else {
-            return Center(
-              child: Text('Resource state is =>> $state'),
-            );
-          }
-        },
+                        ],
+                      )),
+                  ListView.builder(
+                    primary: false,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    itemCount: state.resources.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ResourceWidget(
+                        resource: state.resources[index],
+                      );
+                    },
+                  )
+                ]),
+              );
+            } else {
+              return Center(
+                child: Text('Resource state is =>> $state'),
+              );
+            }
+          },
+        ),
       ),
       floatingActionButton: SpeedDial(
         marginEnd: 18,

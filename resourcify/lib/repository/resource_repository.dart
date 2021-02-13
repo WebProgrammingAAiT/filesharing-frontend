@@ -1,15 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:multipart_request/multipart_request.dart';
 import 'package:resourcify/models/models.dart';
 import 'package:http/http.dart' as http;
 
 abstract class ResourceRepository {
   Future<List<Resource>> getResources(String userId);
   Future<List<Category>> getCategories();
-  Future<Response> createResource(
+  Future<bool> createResource(
       {String filename,
       String filePath,
       String year,
@@ -72,7 +69,7 @@ class ResourceRepositoryImpl implements ResourceRepository {
   }
 
   @override
-  Future<Response> createResource(
+  Future<bool> createResource(
       {String filename,
       String filePath,
       String year,
@@ -81,20 +78,30 @@ class ResourceRepositoryImpl implements ResourceRepository {
       String fileType}) async {
     String token = await getToken();
 
-    var request = MultipartRequest();
-    request.setUrl("$SERVER_IP/resources");
-    request.addHeaders(<String, String>{'Authorization': 'Bearer $token'});
-    request.addFile("files", filePath);
-    request.addFields(<String, String>{
-      'name': filename,
-      'year': year,
-      'department': department,
-      'subject': subject,
-      'fileType': fileType
-    });
+    var request =
+        http.MultipartRequest('POST', Uri.parse('$SERVER_IP/resources'));
 
-    Response response = request.send();
-    return response;
+    request.headers['Authorization'] = 'Bearer $token';
+    request.fields['name'] = filename;
+    request.fields['year'] = year;
+    request.fields['department'] = department;
+    request.fields['subject'] = subject;
+    request.fields['fileType'] = fileType;
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'files',
+        filePath,
+      ),
+    );
+    var res = await request.send();
+    // Extract String from Streamed Response
+
+    var responseString = await res.stream.bytesToString();
+    if (res.statusCode == 201) {
+      return true;
+    } else {
+      throw Exception(json.decode(responseString)['message']);
+    }
   }
 }
 
