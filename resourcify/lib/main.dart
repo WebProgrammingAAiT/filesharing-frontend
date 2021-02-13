@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:resourcify/bloc/auth_bloc.dart';
 import 'package:resourcify/repository/admin_repository.dart';
 import 'package:resourcify/repository/auth_repository.dart';
+import 'package:resourcify/repository/resource_repository.dart';
 import 'package:resourcify/screens/admin_home_screen.dart';
 import 'package:resourcify/screens/home_screen.dart';
 import 'package:resourcify/screens/screens.dart';
@@ -10,6 +11,7 @@ import 'package:resourcify/screens/screens.dart';
 import 'bloc/admin/admin_bloc.dart';
 import 'bloc/admin/admin_department/admin_department_bloc.dart';
 import 'bloc/admin/admin_subject/admin_subject_bloc.dart';
+import 'bloc/resource/resource_bloc.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,6 +33,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => AdminSubjectBloc(AdminRepositoryImpl()),
+          ),
+          BlocProvider(
+            create: (context) => ResourceBloc(ResourceRepositoryImpl()),
           ),
         ],
         child: MaterialApp(

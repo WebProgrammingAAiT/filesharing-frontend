@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/models.dart';
 
 class ResourceWidget extends StatefulWidget {
-  Resource resource;
+  final Resource resource;
 
   ResourceWidget({@required this.resource});
 
@@ -22,11 +22,6 @@ class _ResourceWidgetState extends State<ResourceWidget> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: 5),
@@ -38,12 +33,14 @@ class _ResourceWidgetState extends State<ResourceWidget> {
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Icon(Icons.more_horiz,
-                color: Color(0xff3967D6),),
+                Icon(
+                  Icons.more_horiz,
+                  color: Color(0xff3967D6),
+                ),
                 GestureDetector(
-                      child: Text("download",
-                          style: TextStyle(color: Color(0xff3967D6))),
-                    ),
+                  child: Text("download",
+                      style: TextStyle(color: Color(0xff3967D6))),
+                ),
               ],
             ),
             leading: Card(
@@ -76,8 +73,9 @@ class _ResourceWidgetState extends State<ResourceWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(resource.uploadedBy,
-                    style: TextStyle(color: Colors.grey,
-                        )),
+                    style: TextStyle(
+                      color: Colors.grey,
+                    )),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -86,14 +84,17 @@ class _ResourceWidgetState extends State<ResourceWidget> {
                       color: Colors.green,
                     ),
                     Text(resource.likes.toString(),
-                        style: TextStyle(color: Colors.green,)),
+                        style: TextStyle(
+                          color: Colors.green,
+                        )),
                     Icon(
                       Icons.arrow_drop_down,
                       color: Colors.red,
                     ),
                     Text(resource.dislikes.toString(),
-                        style: TextStyle(color: Colors.grey,)),
-                    
+                        style: TextStyle(
+                          color: Colors.grey,
+                        )),
                   ],
                 )
               ],
