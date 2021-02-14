@@ -63,6 +63,12 @@ class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
               );
               BlocProvider.of<AdminDepartmentBloc>(context)
                   .add(GetDepartmentCategories(widget.year.id));
+            } else if (state is AdminDepartmentError) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                ),
+              );
             }
           },
           builder: (context, state) {

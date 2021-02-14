@@ -2,7 +2,7 @@ import 'dart:ffi';
 
 import 'package:equatable/equatable.dart';
 
-class Resource extends Equatable{
+class Resource extends Equatable {
   final String id;
   final String resourceName;
   final String uploadedBy;
@@ -12,7 +12,7 @@ class Resource extends Equatable{
   final int likes;
   final int dislikes;
   final String fileType;
-  final Float fileSize;
+  final double fileSize;
   final bool isLiked;
   final bool isDisliked;
   final List<String> files;
@@ -29,28 +29,35 @@ class Resource extends Equatable{
       this.dislikes,
       this.isLiked,
       this.isDisliked,
-      this.files
-      });
+      this.files});
   factory Resource.fromJson(Map<String, dynamic> json) {
     return Resource(
-        id: json['_id'] as String,
-        resourceName:json['resource_name'] as String,
-        fileType:json['file_type'] as String,
-        fileSize:json['file_size'] as Float,
-        likes: json['likes'] as int,
-        dislikes: json['dislikes'] as int,
-        year: json['year'],
-        subject: json['subject'],
-        department: json['department'],
-        uploadedBy: json['created_by'],
-        isLiked: json['is_liked'] as bool,
-        isDisliked: json['is_disliked'] as bool,
-        files: List<String>.from(json["files"]),
-
-        );
+        id: json['_id'],
+        resourceName: json['name'],
+        fileType: json['fileType'],
+        fileSize: json['fileSize'].toDouble(),
+        likes: json['likes'],
+        dislikes: json['dislikes'],
+        year: json['year']['name'],
+        subject: json['subject']['name'],
+        department: json['department']['name'],
+        uploadedBy: json['createdBy']['username'],
+        isLiked: json['isLiked'] ?? false,
+        isDisliked: json['isDisliked'] ?? false,
+        files: List<String>.from(json["files"].map((x) => x["name"])));
   }
-  
+
   @override
-  List<Object> get props =>
-      [id, resourceName, fileType, fileSize,uploadedBy, likes, dislikes, year, department, subject];
+  List<Object> get props => [
+        id,
+        resourceName,
+        fileType,
+        fileSize,
+        uploadedBy,
+        likes,
+        dislikes,
+        year,
+        department,
+        subject
+      ];
 }

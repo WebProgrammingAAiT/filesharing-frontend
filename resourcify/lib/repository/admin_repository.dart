@@ -16,13 +16,6 @@ class AdminRepositoryImpl implements AdminRepository {
   @override
   Future<List<Category>> getCategories() async {
     List<Category> categoryList = [];
-    categoryList.add(
-      Category(
-        id: '1',
-        name: 'Root',
-        parentId: '-1',
-      ),
-    );
     var res = await http.get(
       '$SERVER_IP/categories',
       headers: <String, String>{
