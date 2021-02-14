@@ -116,38 +116,36 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       context: context,
       builder: (BuildContext context) {
         // return alert dialog object
-        return StatefulBuilder(builder: (context, StateSetter dropdownState) {
-          return AlertDialog(
-            title: new Text('Create new category'),
-            content: Container(
-              height: 150.0,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  TextField(
-                    controller: categoryNameController,
-                    textCapitalization: TextCapitalization.words,
-                    decoration: InputDecoration(hintText: 'Name'),
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(color: Colors.grey),
+        return AlertDialog(
+          title: new Text('Create new category'),
+          content: Container(
+            height: 150.0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                TextField(
+                  controller: categoryNameController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: InputDecoration(hintText: 'Name'),
                 ),
-                onPressed: () => Navigator.pop(context),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey),
               ),
-              TextButton(
-                child: Text('Create'),
-                onPressed: _createCategory,
-              ),
-            ],
-          );
-        });
+              onPressed: () => Navigator.pop(context),
+            ),
+            TextButton(
+              child: Text('Create'),
+              onPressed: _createCategory,
+            ),
+          ],
+        );
       },
     );
   }

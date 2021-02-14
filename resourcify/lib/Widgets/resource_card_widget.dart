@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:resourcify/screens/screens.dart';
 import '../models/models.dart';
 
 class ResourceWidget extends StatefulWidget {
@@ -29,34 +31,62 @@ class _ResourceWidgetState extends State<ResourceWidget> {
         elevation: 2.0,
         child: Container(
           child: ListTile(
+            onTap: () async {
+              var result = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ResourceDetailScreen(
+                    resource: resource,
+                  ),
+                ),
+              );
+
+              if (result is Resource) {
+                setState(() {
+                  resource = result;
+                });
+              }
+            },
             trailing: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Icon(
-                  Icons.more_horiz,
-                  color: Color(0xff3967D6),
-                ),
+                // Icon(
+                //   Icons.more_horiz,
+                //   color: Color(0xff3967D6),
+                // ),
                 GestureDetector(
-                  child: Text("download",
-                      style: TextStyle(color: Color(0xff3967D6))),
+                  onTap: () => print('pressed download'),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 18.0),
+                    child: Text("download",
+                        style: TextStyle(color: Color(0xff3967D6))),
+                  ),
                 ),
               ],
             ),
-            leading: Card(
-              shape: RoundedRectangleBorder(
-                side: BorderSide.none,
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              child: Container(
-                child: resource.fileType == "pdf"
-                    ? Icon(Icons.description)
-                    : Icon(Icons.image),
-                padding: EdgeInsets.all(10),
-              ),
-              elevation: 5.0,
-              borderOnForeground: false,
-              //   ),
+            leading: Container(
+              child: resource.fileType == "pdf"
+                  ? Card(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide.none,
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      child: Icon(Icons.description))
+                  : Container(
+                      width: 80,
+                      child: CachedNetworkImage(
+                        imageUrl:
+                            "http://localhost:8080/public/${resource.files[0]}",
+                        fit: BoxFit.cover,
+                        progressIndicatorBuilder:
+                            (context, url, downloadProgress) => Center(
+                          child: CircularProgressIndicator(
+                              value: downloadProgress.progress),
+                        ),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
+                      ),
+                    ),
+              padding: EdgeInsets.all(10),
             ),
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +102,7 @@ class _ResourceWidgetState extends State<ResourceWidget> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(resource.uploadedBy,
+                Text('by @${resource.uploadedBy.username}',
                     style: TextStyle(
                       color: Colors.grey,
                     )),
