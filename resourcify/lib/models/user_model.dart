@@ -8,16 +8,17 @@ class User extends Equatable {
   final String password;
   final String username;
   final String role;
+  final String profilePicture;
 
-  User({
-    this.id,
-    this.firstName,
-    this.lastName,
-    this.email,
-    this.password,
-    this.username,
-    this.role,
-  });
+  User(
+      {this.id,
+      this.firstName,
+      this.lastName,
+      this.email,
+      this.password,
+      this.username,
+      this.role,
+      this.profilePicture});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -27,10 +28,11 @@ class User extends Equatable {
         email: json['email'],
         password: json['password'] ?? '',
         role: json['role'],
-        username: json['username']);
+        username: json['username'],
+        profilePicture: json['profilePicture']);
   }
 
   @override
   List<Object> get props =>
-      [id, firstName, lastName, email, password, username];
+      [id, firstName, lastName, email, password, username, profilePicture];
 }

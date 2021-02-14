@@ -35,7 +35,15 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<String> jwtOrEmpty() async {
     var jwt = await storage.read(key: "jwt");
     if (jwt == null) return "";
-    return jwt;
+    var splittedJwt = jwt.split(".");
+    var payload = json
+        .decode(ascii.decode(base64.decode(base64.normalize(splittedJwt[1]))));
+    if (DateTime.fromMillisecondsSinceEpoch(payload["exp"] * 1000)
+        .isAfter(DateTime.now())) {
+      return jwt;
+    } else {
+      return '';
+    }
   }
 
   Future<void> removeJwt() async {

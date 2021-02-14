@@ -1,11 +1,12 @@
 import 'dart:ffi';
 
 import 'package:equatable/equatable.dart';
+import 'package:resourcify/models/models.dart';
 
 class Resource extends Equatable {
   final String id;
   final String resourceName;
-  final String uploadedBy;
+  final User uploadedBy;
   final String year;
   final String department;
   final String subject;
@@ -16,6 +17,7 @@ class Resource extends Equatable {
   final bool isLiked;
   final bool isDisliked;
   final List<String> files;
+  final String createdAt;
   Resource(
       {this.id,
       this.resourceName,
@@ -29,6 +31,7 @@ class Resource extends Equatable {
       this.dislikes,
       this.isLiked,
       this.isDisliked,
+      this.createdAt,
       this.files});
   factory Resource.fromJson(Map<String, dynamic> json) {
     return Resource(
@@ -41,7 +44,8 @@ class Resource extends Equatable {
         year: json['year']['name'],
         subject: json['subject']['name'],
         department: json['department']['name'],
-        uploadedBy: json['createdBy']['username'],
+        uploadedBy: User.fromJson(json['createdBy']),
+        createdAt: json['createdAt'],
         isLiked: json['isLiked'] ?? false,
         isDisliked: json['isDisliked'] ?? false,
         files: List<String>.from(json["files"].map((x) => x["name"])));
@@ -58,6 +62,10 @@ class Resource extends Equatable {
         dislikes,
         year,
         department,
-        subject
+        subject,
+        createdAt,
+        files,
+        isLiked,
+        isDisliked
       ];
 }

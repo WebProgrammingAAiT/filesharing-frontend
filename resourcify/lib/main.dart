@@ -13,6 +13,7 @@ import 'bloc/admin/admin_bloc.dart';
 import 'bloc/admin/admin_department/admin_department_bloc.dart';
 import 'bloc/admin/admin_subject/admin_subject_bloc.dart';
 import 'bloc/resource/resource_bloc.dart';
+import 'bloc/resource_detail/resource_detail_bloc.dart';
 
 void main() {
   runApp(MyApp());
@@ -40,6 +41,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => AddResourceBloc(ResourceRepositoryImpl()),
+          ),
+          BlocProvider(
+            create: (context) => ResourceDetailBloc(ResourceRepositoryImpl()),
           ),
         ],
         child: MaterialApp(

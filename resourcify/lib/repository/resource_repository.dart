@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 abstract class ResourceRepository {
   Future<List<Resource>> getResources(String userId);
   Future<List<Category>> getCategories();
+  Future<Resource> getResource(String id);
+  Future<Resource> likeUnlikeResource(String id, String action);
   Future<bool> createResource(
       {String filename,
       String filePath,
@@ -101,6 +103,43 @@ class ResourceRepositoryImpl implements ResourceRepository {
       return true;
     } else {
       throw Exception(json.decode(responseString)['message']);
+    }
+  }
+
+  Future<Resource> getResource(String id) async {
+    String token = await getToken();
+    var res = await http.get(
+      '$SERVER_IP/resources/$id',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    if (res.statusCode == 200) {
+      var resourceInJson = json.decode(res.body);
+
+      return Resource.fromJson(resourceInJson);
+    } else {
+      throw Exception(json.decode(res.body)['message']);
+    }
+  }
+
+  Future<Resource> likeUnlikeResource(String id, String action) async {
+    String token = await getToken();
+    var res = await http.put(
+      '$SERVER_IP/resources/$id?action=$action',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    if (res.statusCode == 201) {
+      var resourceInJson = json.decode(res.body);
+      return Resource.fromJson(resourceInJson);
+    } else {
+      throw Exception(json.decode(res.body)['message']);
     }
   }
 }
