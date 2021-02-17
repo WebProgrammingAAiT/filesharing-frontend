@@ -130,7 +130,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 
   Widget _buildCircularProgressIndicator() {
-    return Center(child: CircularProgressIndicator());
+    return Center(
+      child: CircularProgressIndicator(
+        strokeWidth: 1,
+      ),
+    );
   }
 
   // Show Dialog function

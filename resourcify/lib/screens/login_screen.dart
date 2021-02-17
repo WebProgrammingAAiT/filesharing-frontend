@@ -47,7 +47,9 @@ class _LoginScreenState extends State<LoginScreen> {
               return _buildInitialState();
             } else if (state is AuthLoading) {
               return Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  strokeWidth: 1,
+                ),
               );
             } else if (state is AuthError) {
               return _buildInitialState();

@@ -130,42 +130,6 @@ class ResourceDataProvider {
       throw Exception(json.decode(res.body)['message']);
     }
   }
-
-  Future<Resource> updateResource(String id, String updatedName) async {
-    String token = await getToken();
-    var res = await httpClient.put(
-      '$SERVER_IP/resources/$id/update',
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token'
-      },
-    );
-
-    if (res.statusCode == 201) {
-      var resourceInJson = json.decode(res.body);
-      return Resource.fromJson(resourceInJson);
-    } else {
-      throw Exception(json.decode(res.body)['message']);
-    }
-  }
-
-  Future<Resource> deleteResource(String id) async {
-    String token = await getToken();
-    var res = await httpClient.delete(
-      '$SERVER_IP/resources/$id/delete',
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token'
-      },
-    );
-
-    if (res.statusCode == 201) {
-      var resourceInJson = json.decode(res.body);
-      return Resource.fromJson(resourceInJson);
-    } else {
-      throw Exception(json.decode(res.body)['message']);
-    }
-  }
 }
 
 // List<Resource> _fetchMockData() {

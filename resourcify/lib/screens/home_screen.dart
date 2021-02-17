@@ -243,6 +243,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCircularProgressIndicator() {
-    return Center(child: CircularProgressIndicator());
+    return Center(
+      child: CircularProgressIndicator(
+        strokeWidth: 1,
+      ),
+    );
   }
 }

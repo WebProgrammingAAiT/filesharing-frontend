@@ -106,7 +106,11 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
   }
 
   Widget _buildCircularProgressIndicator() {
-    return Center(child: CircularProgressIndicator());
+    return Center(
+      child: CircularProgressIndicator(
+        strokeWidth: 1,
+      ),
+    );
   }
 
   // Show Dialog function

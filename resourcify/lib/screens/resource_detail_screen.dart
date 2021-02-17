@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:resourcify/bloc/resource_detail/resource_detail_bloc.dart';
 import 'package:resourcify/models/models.dart';
+import 'package:resourcify/screens/screens.dart';
 
 class ResourceDetailScreen extends StatefulWidget {
   final Resource resource;
@@ -84,6 +85,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                                           height: 400,
                                           child: Center(
                                             child: CircularProgressIndicator(
+                                                strokeWidth: 1,
                                                 value:
                                                     downloadProgress.progress),
                                           ),
@@ -143,43 +145,51 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                             ],
                           ),
                         ),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: CircleAvatar(
-                                radius: 30,
-                                backgroundImage: resource
-                                        .uploadedBy.profilePicture.isEmpty
-                                    ? AssetImage(
-                                        "assets/images/person_placeholder.png")
-                                    : CachedNetworkImageProvider(
-                                        resource.uploadedBy.profilePicture),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => UserProfileScreen(
+                                      userId: state.resource.uploadedBy.id,
+                                    )));
+                          },
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: resource
+                                          .uploadedBy.profilePicture.isEmpty
+                                      ? AssetImage(
+                                          "assets/images/person_placeholder.png")
+                                      : CachedNetworkImageProvider(
+                                          resource.uploadedBy.profilePicture),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8.0),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    resource.uploadedBy.username,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      resource.uploadedBy.username,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    uploadDate,
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 12.0,
+                                    Text(
+                                      uploadDate,
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12.0,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         Divider(),
                         SizedBox(
@@ -248,10 +258,16 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                   );
                 } else if (state is ResourceDetailLoading ||
                     state is ResourceDetailInitial) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1,
+                    ),
+                  );
                 } else {
                   return Center(
-                    child: Text('State is $state'),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1,
+                    ),
                   );
                 }
               },

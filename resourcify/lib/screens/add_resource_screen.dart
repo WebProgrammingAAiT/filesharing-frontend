@@ -158,7 +158,7 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
                     width: 20,
                   ),
                   CircularProgressIndicator(
-                    strokeWidth: 2,
+                    strokeWidth: 1,
                   ),
                 ],
               ),
