@@ -21,13 +21,10 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // resource = widget.resource;
-    // DateTime tempDate = new DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    //     .parse(resource.createdAt);
 
-    // tempDate = tempDate.add(tempDate.timeZoneOffset);
-    // uploadDate = DateFormat.yMEd().add_jm().format(tempDate);
-    // context.read<ResourceDetailBloc>().add(ResourceDetailInitialize());
+    // BlocProvider.of<ResourceDetailBloc>(context)
+    //     .add(GetResourceDetail(widget.resource.id));
+
     context
         .read<ResourceDetailBloc>()
         .add(GetResourceDetail(widget.resource.id));
@@ -37,15 +34,6 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   backgroundColor: Colors.white,
-      //   elevation: 0,
-      //   leading: IconButton(
-      //     icon: Icon(Icons.arrow_back_ios),
-      //     color: Colors.black,
-      //     onPressed: () {},
-      //   ),
-      // ),
       body: WillPopScope(
         onWillPop: () async {
           Navigator.pop(context, resource);

@@ -124,7 +124,22 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             } else {
               return Center(
-                child: Text('Resource state is =>> $state'),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Something went wrong....',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                    RaisedButton(
+                      onPressed: onRefresh,
+                      color: Colors.blue,
+                      textColor: Colors.white,
+                      child: Text('Click to refresh'),
+                    ),
+                  ],
+                ),
               );
             }
           },

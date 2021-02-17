@@ -42,8 +42,7 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
       ),
       body: BlocListener<AdminDepartmentBloc, AdminDepartmentState>(
           listener: (context, state) {
-            if (state is AdminDepartmentLoading ||
-                state is AdminDepartmentUpdated) {
+            if (state is AdminDepartmentUpdated) {
               Navigator.pop(context);
             }
           },
