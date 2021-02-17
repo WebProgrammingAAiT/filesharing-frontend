@@ -52,11 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
             } else if (state is AuthError) {
               return _buildInitialState();
             } else
-              return Container(
-                child: Center(
-                  child: Text('State in Login screen is >>  $state'),
-                ),
-              );
+              return SizedBox.shrink();
           },
         ));
   }

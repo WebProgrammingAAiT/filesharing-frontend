@@ -24,6 +24,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     super.initState();
   }
 
+  Future<void> onRefresh() async {
+    return context.read<AdminBloc>().add(GetCategories());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,41 +45,61 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               })
         ],
       ),
-      body: BlocConsumer<AdminBloc, AdminState>(listener: (context, state) {
-        print(state);
-        if (state is AdminYearCreated) {
-          Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Category created successfully!'),
-            ),
-          );
-          BlocProvider.of<AdminBloc>(context).add(GetCategories());
-        } else if (state is AdminError) {
-          Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-            ),
-          );
-        } else if (state is AdminYearUpdated) {
-          Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Category updated successfully!'),
-            ),
-          );
-          BlocProvider.of<AdminBloc>(context).add(GetCategories());
-        }
-      }, builder: (context, state) {
-        if (state is AdminInitial || state is AdminLoading) {
-          return _buildCircularProgressIndicator();
-        } else if (state is AdminCategoriesLoaded) {
-          categories = state.categories;
-          return _buildYear(state.categories);
-        } else {
-          return Center(
-            child: Text('Admin state is =>> $state'),
-          );
-        }
-      }),
+      body: BlocConsumer<AdminBloc, AdminState>(
+        listener: (context, state) {
+          print(state);
+          if (state is AdminYearCreated) {
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Category created successfully!'),
+              ),
+            );
+            BlocProvider.of<AdminBloc>(context).add(GetCategories());
+          } else if (state is AdminError) {
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+              ),
+            );
+          } else if (state is AdminYearUpdated) {
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Category updated successfully!'),
+              ),
+            );
+            BlocProvider.of<AdminBloc>(context).add(GetCategories());
+          }
+        },
+        builder: (context, state) {
+          if (state is AdminInitial ||
+              state is AdminLoading ||
+              state is AdminYearUpdated) {
+            return _buildCircularProgressIndicator();
+          } else if (state is AdminCategoriesLoaded) {
+            categories = state.categories;
+            return _buildYear(state.categories);
+          } else {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Something went wrong....',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                  RaisedButton(
+                    onPressed: onRefresh,
+                    color: Colors.blue,
+                    textColor: Colors.white,
+                    child: Text('Click to refresh'),
+                  ),
+                ],
+              ),
+            );
+            ;
+          }
+        },
+      ),
       floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add), onPressed: () => _showDialog(context)),
     );

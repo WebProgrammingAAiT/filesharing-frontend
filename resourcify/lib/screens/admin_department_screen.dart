@@ -40,7 +40,8 @@ class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
       ),
       body: BlocListener<AdminBloc, AdminState>(
         listener: (context, state) {
-          if (state is AdminLoading || state is AdminYearUpdated) {
+          print("State in depscreen $state");
+          if (state is AdminYearUpdated) {
             Navigator.pop(context);
           }
         },
