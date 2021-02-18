@@ -79,7 +79,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             );
             BlocProvider.of<UserBloc>(context)
                 .add(GetUserResources(widget.userId));
+          } else if (state is UserInfoUpdated) {
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+              ),
+            );
+            BlocProvider.of<UserBloc>(context)
+                .add(GetUserResources(widget.userId));
           } else if (state is UserError) {
+            print(state.message);
             Scaffold.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -150,7 +159,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 backgroundImage: user.profilePicture.isEmpty
                     ? AssetImage("assets/images/person_placeholder.png")
                     : CachedNetworkImageProvider(
-                        "http://localhost:8080/public/${user.profilePicture}"),
+                        "http://localhost:8080/public/userProfilePictures/${user.profilePicture}"),
               ),
               Expanded(
                 child: Column(
@@ -188,7 +197,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => EditProfileScreen(
-                                    user: user,
+                                    userId: widget.userId,
                                   ),
                                 ),
                               ),
@@ -296,7 +305,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             backgroundImage: resource.uploadedBy.profilePicture.isEmpty
                 ? AssetImage("assets/images/person_placeholder.png")
                 : CachedNetworkImageProvider(
-                    resource.uploadedBy.profilePicture),
+                    "http://localhost:8080/public/userProfilePictures/${resource.uploadedBy.profilePicture}"),
           ),
         ),
         const SizedBox(width: 8.0),

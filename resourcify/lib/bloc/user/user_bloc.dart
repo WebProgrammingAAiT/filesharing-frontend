@@ -24,6 +24,27 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       } catch (e) {
         yield UserError(e.toString() ?? 'An unknown error occured');
       }
+    } else if (event is UpdateUserInfo) {
+      try {
+        yield UserLoading();
+        bool created = await userRepository.updateUser(
+            event.userId,
+            event.firstName,
+            event.username,
+            event.currentPassword,
+            event.newPassword,
+            event.year,
+            event.department,
+            event.profilePicture);
+
+        if (created == true) {
+          yield UserInfoUpdated('User info updated successfully');
+        } else {
+          yield UserError('Couldn\'t update user info');
+        }
+      } catch (e) {
+        yield UserError(e.toString() ?? 'An unknown error occured');
+      }
     } else if (event is GetUserResources) {
       yield UserLoading();
       try {

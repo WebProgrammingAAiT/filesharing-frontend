@@ -43,3 +43,9 @@ class UserResourceUpdated extends UserState {
 }
 
 class UserResourceDeleted extends UserState {}
+
+class UserInfoUpdated extends UserState {
+  final String message;
+  const UserInfoUpdated(this.message);
+  List<Object> get props => [message];
+}
