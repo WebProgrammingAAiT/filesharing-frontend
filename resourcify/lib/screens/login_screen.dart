@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:resourcify/bloc/admin/admin_bloc.dart';
 import 'package:resourcify/bloc/auth_bloc.dart';
-import 'package:resourcify/repository/admin_repository.dart';
 import 'package:resourcify/screens/screens.dart';
 import 'package:resourcify/screens/constants.dart';
 
@@ -25,38 +23,37 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
         body: BlocConsumer<AuthBloc, AuthState>(
-          listener: (context, state) {
-            if (state is AuthError) {
-              Scaffold.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                ),
-              );
-            } else if (state is AuthLoaded) {
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (_) => HomeScreen()));
-            } else if (state is AuthAdminLoaded) {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (_) => AdminHomeScreen()));
-            }
-          },
-          builder: (context, state) {
-            if (state is AuthNotLoggedIn || state is AuthJwtRemoved) {
-              return _buildInitialState();
-            } else if (state is AuthLoading) {
-              return Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 1,
-                ),
-              );
-            } else if (state is AuthError) {
-              return _buildInitialState();
-            } else
-              return SizedBox.shrink();
-          },
-        ));
+      listener: (context, state) {
+        if (state is AuthError) {
+          Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+            ),
+          );
+        } else if (state is AuthLoaded) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => HomeScreen()));
+        } else if (state is AuthAdminLoaded) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => AdminHomeScreen()));
+        }
+      },
+      builder: (context, state) {
+        if (state is AuthNotLoggedIn || state is AuthJwtRemoved) {
+          return _buildInitialState();
+        } else if (state is AuthLoading) {
+          return Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 1,
+            ),
+          );
+        } else if (state is AuthError) {
+          return _buildInitialState();
+        } else
+          return SizedBox.shrink();
+      },
+    ));
   }
 
   Widget _buildInitialState() {
@@ -142,7 +139,6 @@ class _LoginScreenState extends State<LoginScreen> {
             icon: Icon(
               // Based on passwordVisible state choose the icon
               _passwordVisible ? Icons.visibility : Icons.visibility_off,
-              color: Theme.of(context).primaryColorDark,
             ),
             onPressed: () {
               // Update the state i.e. toogle the state of passwordVisible variable

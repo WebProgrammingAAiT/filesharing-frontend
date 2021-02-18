@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:resourcify/bloc/admin/admin_department/admin_department_bloc.dart';
 import 'package:resourcify/bloc/admin/admin_subject/admin_subject_bloc.dart';
 import 'package:resourcify/models/models.dart';
+import 'package:resourcify/widgets/alert_dialog_container.dart';
 
 class AdminSubjectScreen extends StatefulWidget {
   final Category department;
@@ -101,7 +102,8 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
             },
           )),
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add), onPressed: () => _showDialog(context)),
+          child: Icon(Icons.add),
+          onPressed: () => _showCreateSubjectDialog(context)),
     );
   }
 
@@ -114,124 +116,49 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
   }
 
   // Show Dialog function
-  void _showDialog(context) {
-    // flutter defined function
+  void _showCreateSubjectDialog(context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return alert dialog object
-        return AlertDialog(
-          title: Text('Create new subject'),
-          content: Container(
-            height: 150.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                TextField(
-                  controller: subjectController,
-                  textCapitalization: TextCapitalization.words,
-                  decoration: InputDecoration(hintText: 'Name'),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            TextButton(
-              child: Text('Create'),
-              onPressed: _createCategory,
-            ),
-          ],
-        );
+        return AlertDialogContainer(
+            title: 'Create new subject',
+            hintText: 'Name',
+            buttonName: 'Create',
+            context: context,
+            controller: subjectController,
+            onActionButtonPressed: _createCategory);
       },
     );
   }
 
   // Show Dialog function
   void _showEditSubjectDialog(context, String subjectId) {
-    // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return alert dialog object
-        return AlertDialog(
-          title: Text('Edit subject'),
-          content: Container(
-            height: 150.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                TextField(
-                  controller: editSubjectController,
-                  textCapitalization: TextCapitalization.words,
-                  decoration: InputDecoration(hintText: 'Subject'),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            TextButton(
-              child: Text('Update'),
-              onPressed: () => _updateSubject(subjectId),
-            ),
-          ],
-        );
+        return AlertDialogContainer(
+            title: 'Edit subject',
+            hintText: 'Subject',
+            buttonName: 'Update',
+            context: context,
+            controller: editSubjectController,
+            onActionButtonPressed: () => _updateSubject(subjectId));
       },
     );
   }
 
   // Show Dialog function
   void _showEditDepartmentDialog(context) {
-    // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return alert dialog object
-        return AlertDialog(
-          title: Text('Edit department'),
-          content: Container(
-            height: 150.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                TextField(
-                  controller: departmentController,
-                  textCapitalization: TextCapitalization.words,
-                  decoration: InputDecoration(hintText: 'Department'),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            TextButton(
-              child: Text('Update'),
-              onPressed: _updateDepartment,
-            ),
-          ],
-        );
+        return AlertDialogContainer(
+            title: 'Edit department',
+            hintText: 'Department',
+            buttonName: 'Update',
+            context: context,
+            controller: departmentController,
+            onActionButtonPressed: _updateDepartment);
       },
     );
   }

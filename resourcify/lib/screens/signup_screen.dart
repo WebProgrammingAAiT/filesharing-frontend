@@ -18,7 +18,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
@@ -121,7 +120,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
             icon: Icon(
               // Based on passwordVisible state choose the icon
               _passwordVisible ? Icons.visibility : Icons.visibility_off,
-              color: Theme.of(context).primaryColorDark,
             ),
             onPressed: () {
               // Update the state i.e. toogle the state of passwordVisible variable

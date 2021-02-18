@@ -79,10 +79,7 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Resourcify',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-          ),
+          theme: ThemeData.dark(),
           home: _DisplayScreen(),
         ));
   }

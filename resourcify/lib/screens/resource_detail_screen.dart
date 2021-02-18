@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:resourcify/bloc/resource_detail/resource_detail_bloc.dart';
 import 'package:resourcify/models/models.dart';
 import 'package:resourcify/screens/screens.dart';
+import 'package:resourcify/widgets/resource_image_container.dart';
 
 class ResourceDetailScreen extends StatefulWidget {
   final Resource resource;
@@ -34,7 +35,6 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: WillPopScope(
         onWillPop: () async {
           Navigator.pop(context, resource);
@@ -68,32 +68,8 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         resource.fileType == 'image'
-                            ? ClipRect(
-                                child: InteractiveViewer(
-                                    // boundaryMargin: EdgeInsets.all(20.0),
-                                    minScale: 0.1,
-                                    maxScale: 10,
-                                    child: Container(
-                                      height: 350,
-                                      child: CachedNetworkImage(
-                                        imageUrl:
-                                            "http://localhost:8080/public/${resource.files[0]}",
-                                        fit: BoxFit.fill,
-                                        progressIndicatorBuilder:
-                                            (context, url, downloadProgress) =>
-                                                Container(
-                                          height: 400,
-                                          child: Center(
-                                            child: CircularProgressIndicator(
-                                                strokeWidth: 1,
-                                                value:
-                                                    downloadProgress.progress),
-                                          ),
-                                        ),
-                                        errorWidget: (context, url, error) =>
-                                            Icon(Icons.error),
-                                      ),
-                                    )),
+                            ? ResourceImageContainer(
+                                imageUrl: resource.files[0],
                               )
                             : Text('Do for pdf'),
                         Container(
@@ -330,21 +306,18 @@ class _ReactButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Material(
-        color: Colors.white,
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            height: 40.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                icon,
-                const SizedBox(width: 4.0),
-                Text(label),
-              ],
-            ),
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          height: 40.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              icon,
+              const SizedBox(width: 4.0),
+              Text(label),
+            ],
           ),
         ),
       ),

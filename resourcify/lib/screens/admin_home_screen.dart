@@ -4,6 +4,7 @@ import 'package:resourcify/bloc/admin/admin_bloc.dart';
 import 'package:resourcify/bloc/auth_bloc.dart';
 import 'package:resourcify/models/models.dart';
 import 'package:resourcify/screens/login_screen.dart';
+import 'package:resourcify/widgets/alert_dialog_container.dart';
 
 import 'admin_department_screen.dart';
 
@@ -101,7 +102,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add), onPressed: () => _showDialog(context)),
+          child: Icon(Icons.add),
+          onPressed: () => _showCreateYearDialog(context)),
     );
   }
 
@@ -111,21 +113,24 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       if (cat.type == 'year') yearList.add(cat);
     }).toList();
     print(yearList.length);
-    return ListView.builder(
-      itemCount: yearList.length,
-      itemBuilder: (BuildContext context, int index) {
-        Category cat = yearList[index];
-        return ListTile(
-          title: Text(cat.name),
-          trailing: Icon(Icons.arrow_forward_ios),
-          onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => AdminDepartmentScreen(
-                      year: cat,
-                    )));
-          },
-        );
-      },
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      child: ListView.builder(
+        itemCount: yearList.length,
+        itemBuilder: (BuildContext context, int index) {
+          Category cat = yearList[index];
+          return ListTile(
+            title: Text(cat.name),
+            trailing: Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => AdminDepartmentScreen(
+                        year: cat,
+                      )));
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -138,42 +143,18 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 
   // Show Dialog function
-  void _showDialog(context) {
+  void _showCreateYearDialog(context) {
     // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return alert dialog object
-        return AlertDialog(
-          title: new Text('Create new category'),
-          content: Container(
-            height: 150.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                TextField(
-                  controller: categoryNameController,
-                  textCapitalization: TextCapitalization.words,
-                  decoration: InputDecoration(hintText: 'Name'),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            TextButton(
-              child: Text('Create'),
-              onPressed: _createCategory,
-            ),
-          ],
-        );
+        return AlertDialogContainer(
+            title: 'Create new category',
+            hintText: 'Name',
+            buttonName: 'Create',
+            context: context,
+            controller: categoryNameController,
+            onActionButtonPressed: _createCategory);
       },
     );
   }
