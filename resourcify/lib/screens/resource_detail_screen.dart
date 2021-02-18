@@ -139,7 +139,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                                       ? AssetImage(
                                           "assets/images/person_placeholder.png")
                                       : CachedNetworkImageProvider(
-                                          resource.uploadedBy.profilePicture),
+                                          "http://localhost:8080/public/userProfilePictures/${resource.uploadedBy.profilePicture}"),
                                 ),
                               ),
                               const SizedBox(width: 8.0),

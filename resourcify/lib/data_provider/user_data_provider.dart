@@ -77,6 +77,46 @@ class UserDataProvider {
     }
   }
 
+  Future<bool> updateUser(
+    String userId,
+    String firstName,
+    String username,
+    String currentPassword,
+    String newPassword,
+    String year,
+    String department,
+    String profilePicture,
+  ) async {
+    String token = await getToken();
+
+    var request =
+        http.MultipartRequest('PUT', Uri.parse('$SERVER_IP/users/$userId'));
+
+    request.headers['Authorization'] = 'Bearer $token';
+    request.fields['firstName'] = firstName;
+    request.fields['username'] = username;
+    request.fields['currentPassword'] = currentPassword;
+    request.fields['newPassword'] = newPassword;
+    request.fields['year'] = year;
+    request.fields['department'] = department;
+    if (profilePicture.isNotEmpty) {
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'profilePicture',
+          profilePicture,
+        ),
+      );
+    }
+    var res = await request.send();
+
+    var responseString = await res.stream.bytesToString();
+    if (res.statusCode == 201) {
+      return true;
+    } else {
+      throw Exception(json.decode(responseString)['message']);
+    }
+  }
+
   Future<void> deleteUserResource(String id) async {
     String token = await getToken();
     var res = await httpClient.delete(
