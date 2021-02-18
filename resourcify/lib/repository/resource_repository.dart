@@ -37,14 +37,6 @@ class ResourceRepository {
   Future<Resource> likeUnlikeResource(String id, String action) async {
     return await resourceDataProvider.likeUnlikeResource(id, action);
   }
-
-  Future<Resource> deleteResource(String id) async {
-    return await resourceDataProvider.deleteResource(id);
-  }
-
-  Future<Resource> updateResource(String id, String updatedName) async {
-    return await resourceDataProvider.updateResource(id, updatedName);
-  }
 }
 
 // List<Resource> _fetchMockData() {

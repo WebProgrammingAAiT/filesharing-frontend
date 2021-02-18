@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.black,
         title: Text('Home'),
         centerTitle: true,
         leading: SizedBox.shrink(),
@@ -243,6 +244,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCircularProgressIndicator() {
-    return Center(child: CircularProgressIndicator());
+    return Center(
+      child: CircularProgressIndicator(
+        strokeWidth: 1,
+      ),
+    );
   }
 }

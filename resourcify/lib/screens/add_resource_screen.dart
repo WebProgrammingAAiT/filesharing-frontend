@@ -74,7 +74,7 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
                       child: Text(
                         'FILE NAME',
                         style: TextStyle(
-                            color: Colors.black54,
+                            // color: Colors.black54,
                             // fontWeight: FontWeight.bold,
                             letterSpacing: 1.2,
                             fontSize: 16),
@@ -91,8 +91,9 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
                         decoration: InputDecoration(
                           filled: true,
                           border: InputBorder.none,
-                          fillColor: Colors.grey[100],
-                          contentPadding: EdgeInsets.only(top: 14, left: 10),
+                          hintText: '---',
+                          fillColor: Colors.grey[700],
+                          // contentPadding: EdgeInsets.only(top: 14, left: 10),
                         ),
                       ),
                     ),
@@ -158,7 +159,7 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
                     width: 20,
                   ),
                   CircularProgressIndicator(
-                    strokeWidth: 2,
+                    strokeWidth: 1,
                   ),
                 ],
               ),
@@ -178,7 +179,7 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
         border: Border.all(color: Colors.grey[400], width: 1),
-        color: Colors.white,
+        // color: Colors.white,
       ),
       child: file != null
           ? widget.type == 'image'
@@ -230,6 +231,7 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         RaisedButton(
+          color: Colors.grey,
           padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
           onPressed: () {
             Navigator.pop(context);
@@ -313,7 +315,7 @@ class _BuildDropdownWidget extends StatelessWidget {
           child: Text(
             title,
             style: TextStyle(
-                color: Colors.black54,
+                // color: Colors.black54,
                 // fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
                 fontSize: 16),

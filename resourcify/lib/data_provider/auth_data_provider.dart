@@ -24,6 +24,8 @@ class AuthDataProvider {
             <String, String>{"email": email.trim(), "password": password}));
     if (res.statusCode == 200) {
       await storage.write(key: 'jwt', value: json.decode(res.body)['token']);
+      await storage.write(
+          key: 'userId', value: json.decode(res.body)['user']['_id']);
       return User.fromJson(json.decode(res.body)['user']);
     } else {
       throw Exception(json.decode(res.body)['message']);

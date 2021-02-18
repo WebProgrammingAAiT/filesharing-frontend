@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:resourcify/bloc/resource_detail/resource_detail_bloc.dart';
 import 'package:resourcify/models/models.dart';
+import 'package:resourcify/screens/screens.dart';
+import 'package:resourcify/widgets/resource_image_container.dart';
 
 class ResourceDetailScreen extends StatefulWidget {
   final Resource resource;
@@ -33,7 +35,6 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: WillPopScope(
         onWillPop: () async {
           Navigator.pop(context, resource);
@@ -67,31 +68,8 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         resource.fileType == 'image'
-                            ? ClipRect(
-                                child: InteractiveViewer(
-                                    // boundaryMargin: EdgeInsets.all(20.0),
-                                    minScale: 0.1,
-                                    maxScale: 10,
-                                    child: Container(
-                                      height: 350,
-                                      child: CachedNetworkImage(
-                                        imageUrl:
-                                            "http://localhost:8080/public/${resource.files[0]}",
-                                        fit: BoxFit.fill,
-                                        progressIndicatorBuilder:
-                                            (context, url, downloadProgress) =>
-                                                Container(
-                                          height: 400,
-                                          child: Center(
-                                            child: CircularProgressIndicator(
-                                                value:
-                                                    downloadProgress.progress),
-                                          ),
-                                        ),
-                                        errorWidget: (context, url, error) =>
-                                            Icon(Icons.error),
-                                      ),
-                                    )),
+                            ? ResourceImageContainer(
+                                imageUrl: resource.files[0],
                               )
                             : Text('Do for pdf'),
                         Container(
@@ -143,43 +121,51 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                             ],
                           ),
                         ),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: CircleAvatar(
-                                radius: 30,
-                                backgroundImage: resource
-                                        .uploadedBy.profilePicture.isEmpty
-                                    ? AssetImage(
-                                        "assets/images/person_placeholder.png")
-                                    : CachedNetworkImageProvider(
-                                        resource.uploadedBy.profilePicture),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => UserProfileScreen(
+                                      userId: state.resource.uploadedBy.id,
+                                    )));
+                          },
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: resource
+                                          .uploadedBy.profilePicture.isEmpty
+                                      ? AssetImage(
+                                          "assets/images/person_placeholder.png")
+                                      : CachedNetworkImageProvider(
+                                          resource.uploadedBy.profilePicture),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8.0),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    resource.uploadedBy.username,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      resource.uploadedBy.username,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    uploadDate,
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 12.0,
+                                    Text(
+                                      uploadDate,
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12.0,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         Divider(),
                         SizedBox(
@@ -248,10 +234,16 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                   );
                 } else if (state is ResourceDetailLoading ||
                     state is ResourceDetailInitial) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1,
+                    ),
+                  );
                 } else {
                   return Center(
-                    child: Text('State is $state'),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1,
+                    ),
                   );
                 }
               },
@@ -314,21 +306,18 @@ class _ReactButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Material(
-        color: Colors.white,
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            height: 40.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                icon,
-                const SizedBox(width: 4.0),
-                Text(label),
-              ],
-            ),
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          height: 40.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              icon,
+              const SizedBox(width: 4.0),
+              Text(label),
+            ],
           ),
         ),
       ),

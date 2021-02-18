@@ -4,6 +4,7 @@ import 'package:resourcify/bloc/admin/admin_bloc.dart';
 import 'package:resourcify/bloc/admin/admin_department/admin_department_bloc.dart';
 import 'package:resourcify/models/models.dart';
 import 'package:resourcify/screens/admin_subject_screen.dart';
+import 'package:resourcify/widgets/alert_dialog_container.dart';
 
 class AdminDepartmentScreen extends StatefulWidget {
   final Category year;
@@ -106,51 +107,31 @@ class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add), onPressed: () => _showDialog(context)),
+          child: Icon(Icons.add),
+          onPressed: () => _showCreateDepartmentDialog(context)),
     );
   }
 
   Widget _buildCircularProgressIndicator() {
-    return Center(child: CircularProgressIndicator());
+    return Center(
+      child: CircularProgressIndicator(
+        strokeWidth: 1,
+      ),
+    );
   }
 
   // Show Dialog function
-  void _showDialog(context) {
-    // flutter defined function
+  void _showCreateDepartmentDialog(context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return alert dialog object
-        return AlertDialog(
-          title: new Text('Create new department'),
-          content: Container(
-            height: 150.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                TextField(
-                  controller: departmentController,
-                  textCapitalization: TextCapitalization.words,
-                  decoration: InputDecoration(hintText: 'Name'),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            TextButton(
-              child: Text('Create'),
-              onPressed: _createCategory,
-            ),
-          ],
-        );
+        return AlertDialogContainer(
+            title: 'Create new department',
+            hintText: 'Name',
+            buttonName: 'Create',
+            context: context,
+            controller: departmentController,
+            onActionButtonPressed: _createCategory);
       },
     );
   }
@@ -158,40 +139,17 @@ class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
   // Show Dialog function
   void _showEditYearDialog(context) {
     // flutter defined function
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return alert dialog object
-        return AlertDialog(
-          title: Text('Edit department'),
-          content: Container(
-            height: 150.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                TextField(
-                  controller: editYearController,
-                  textCapitalization: TextCapitalization.words,
-                  decoration: InputDecoration(hintText: 'Department'),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            TextButton(
-              child: Text('Update'),
-              onPressed: _updateYear,
-            ),
-          ],
-        );
+        return AlertDialogContainer(
+            title: 'Edit department',
+            hintText: 'Department',
+            buttonName: 'Update',
+            context: context,
+            controller: editYearController,
+            onActionButtonPressed: _updateYear);
       },
     );
   }

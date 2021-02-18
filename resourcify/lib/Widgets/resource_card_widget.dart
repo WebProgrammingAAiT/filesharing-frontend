@@ -81,7 +81,7 @@ class _ResourceWidgetState extends State<ResourceWidget> {
                         progressIndicatorBuilder:
                             (context, url, downloadProgress) => Center(
                           child: CircularProgressIndicator(
-                              value: downloadProgress.progress),
+                              strokeWidth: 1, value: downloadProgress.progress),
                         ),
                         errorWidget: (context, url, error) => Icon(Icons.error),
                       ),
