@@ -4,6 +4,7 @@ import 'package:resourcify/bloc/admin/admin_bloc.dart';
 import 'package:resourcify/bloc/auth_bloc.dart';
 import 'package:resourcify/models/models.dart';
 import 'package:resourcify/screens/login_screen.dart';
+import 'package:resourcify/widgets/alert_dialog_container.dart';
 
 import 'admin_department_screen.dart';
 
@@ -24,6 +25,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     super.initState();
   }
 
+  Future<void> onRefresh() async {
+    return context.read<AdminBloc>().add(GetCategories());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,43 +46,64 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               })
         ],
       ),
-      body: BlocConsumer<AdminBloc, AdminState>(listener: (context, state) {
-        print(state);
-        if (state is AdminYearCreated) {
-          Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Category created successfully!'),
-            ),
-          );
-          BlocProvider.of<AdminBloc>(context).add(GetCategories());
-        } else if (state is AdminError) {
-          Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-            ),
-          );
-        } else if (state is AdminYearUpdated) {
-          Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Category updated successfully!'),
-            ),
-          );
-          BlocProvider.of<AdminBloc>(context).add(GetCategories());
-        }
-      }, builder: (context, state) {
-        if (state is AdminInitial || state is AdminLoading) {
-          return _buildCircularProgressIndicator();
-        } else if (state is AdminCategoriesLoaded) {
-          categories = state.categories;
-          return _buildYear(state.categories);
-        } else {
-          return Center(
-            child: Text('Admin state is =>> $state'),
-          );
-        }
-      }),
+      body: BlocConsumer<AdminBloc, AdminState>(
+        listener: (context, state) {
+          print(state);
+          if (state is AdminYearCreated) {
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Category created successfully!'),
+              ),
+            );
+            BlocProvider.of<AdminBloc>(context).add(GetCategories());
+          } else if (state is AdminError) {
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+              ),
+            );
+          } else if (state is AdminYearUpdated) {
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Category updated successfully!'),
+              ),
+            );
+            BlocProvider.of<AdminBloc>(context).add(GetCategories());
+          }
+        },
+        builder: (context, state) {
+          if (state is AdminInitial ||
+              state is AdminLoading ||
+              state is AdminYearUpdated) {
+            return _buildCircularProgressIndicator();
+          } else if (state is AdminCategoriesLoaded) {
+            categories = state.categories;
+            return _buildYear(state.categories);
+          } else {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Something went wrong....',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                  RaisedButton(
+                    onPressed: onRefresh,
+                    color: Colors.blue,
+                    textColor: Colors.white,
+                    child: Text('Click to refresh'),
+                  ),
+                ],
+              ),
+            );
+            ;
+          }
+        },
+      ),
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add), onPressed: () => _showDialog(context)),
+          child: Icon(Icons.add),
+          onPressed: () => _showCreateYearDialog(context)),
     );
   }
 
@@ -87,65 +113,48 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       if (cat.type == 'year') yearList.add(cat);
     }).toList();
     print(yearList.length);
-    return ListView.builder(
-      itemCount: yearList.length,
-      itemBuilder: (BuildContext context, int index) {
-        Category cat = yearList[index];
-        return ListTile(
-          title: Text(cat.name),
-          trailing: Icon(Icons.arrow_forward_ios),
-          onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => AdminDepartmentScreen(
-                      year: cat,
-                    )));
-          },
-        );
-      },
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      child: ListView.builder(
+        itemCount: yearList.length,
+        itemBuilder: (BuildContext context, int index) {
+          Category cat = yearList[index];
+          return ListTile(
+            title: Text(cat.name),
+            trailing: Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => AdminDepartmentScreen(
+                        year: cat,
+                      )));
+            },
+          );
+        },
+      ),
     );
   }
 
   Widget _buildCircularProgressIndicator() {
-    return Center(child: CircularProgressIndicator());
+    return Center(
+      child: CircularProgressIndicator(
+        strokeWidth: 1,
+      ),
+    );
   }
 
   // Show Dialog function
-  void _showDialog(context) {
+  void _showCreateYearDialog(context) {
     // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return alert dialog object
-        return AlertDialog(
-          title: new Text('Create new category'),
-          content: Container(
-            height: 150.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                TextField(
-                  controller: categoryNameController,
-                  textCapitalization: TextCapitalization.words,
-                  decoration: InputDecoration(hintText: 'Name'),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            TextButton(
-              child: Text('Create'),
-              onPressed: _createCategory,
-            ),
-          ],
-        );
+        return AlertDialogContainer(
+            title: 'Create new category',
+            hintText: 'Name',
+            buttonName: 'Create',
+            context: context,
+            controller: categoryNameController,
+            onActionButtonPressed: _createCategory);
       },
     );
   }

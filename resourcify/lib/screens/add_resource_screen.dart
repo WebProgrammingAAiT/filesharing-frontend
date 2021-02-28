@@ -28,6 +28,7 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
   List<Category> subjectList = [];
   File file;
   TextEditingController fileNameController = TextEditingController();
+  bool _isFileLoading = false;
   @override
   void initState() {
     super.initState();
@@ -74,7 +75,7 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
                       child: Text(
                         'FILE NAME',
                         style: TextStyle(
-                            color: Colors.black54,
+                            // color: Colors.black54,
                             // fontWeight: FontWeight.bold,
                             letterSpacing: 1.2,
                             fontSize: 16),
@@ -91,8 +92,9 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
                         decoration: InputDecoration(
                           filled: true,
                           border: InputBorder.none,
-                          fillColor: Colors.grey[100],
-                          contentPadding: EdgeInsets.only(top: 14, left: 10),
+                          hintText: '---',
+                          fillColor: Colors.grey[700],
+                          // contentPadding: EdgeInsets.only(top: 14, left: 10),
                         ),
                       ),
                     ),
@@ -158,7 +160,7 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
                     width: 20,
                   ),
                   CircularProgressIndicator(
-                    strokeWidth: 2,
+                    strokeWidth: 1,
                   ),
                 ],
               ),
@@ -178,24 +180,28 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
         border: Border.all(color: Colors.grey[400], width: 1),
-        color: Colors.white,
+        // color: Colors.white,
       ),
-      child: file != null
+      child: file != null || _isFileLoading
           ? widget.type == 'image'
-              ? Image.file(
-                  file,
-                  fit: BoxFit.cover,
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.description,
-                      size: 130,
-                    ),
-                    Text('Added file ${file.uri}')
-                  ],
-                )
+              ? _isFileLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : Image.file(
+                      file,
+                      fit: BoxFit.cover,
+                    )
+              : _isFileLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.description,
+                          size: 130,
+                        ),
+                        Text('Added file ${file.uri}')
+                      ],
+                    )
           : Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -230,6 +236,7 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         RaisedButton(
+          color: Colors.grey,
           padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
           onPressed: () {
             Navigator.pop(context);
@@ -279,6 +286,9 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
   }
 
   Future<void> _pickFile() async {
+    setState(() {
+      _isFileLoading = true;
+    });
     FilePickerResult result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: widget.type == 'image' ? ['jpg', 'png'] : ['pdf'],
@@ -287,9 +297,13 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
     if (result != null) {
       setState(() {
         file = File(result.files.single.path);
+        _isFileLoading = false;
       });
     } else {
       // User canceled the picker
+      setState(() {
+        _isFileLoading = false;
+      });
     }
   }
 }
@@ -313,7 +327,7 @@ class _BuildDropdownWidget extends StatelessWidget {
           child: Text(
             title,
             style: TextStyle(
-                color: Colors.black54,
+                // color: Colors.black54,
                 // fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
                 fontSize: 16),

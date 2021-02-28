@@ -1,17 +1,62 @@
-import 'package:resourcify/data_provider/resource_data_provider.dart';
+import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:resourcify/models/models.dart';
+import 'package:http/http.dart' as http;
 
-class ResourceRepository {
-  final ResourceDataProvider resourceDataProvider;
+class ResourceDataProvider {
+  static const String SERVER_IP = 'http://localhost:3000/api';
+  final storage = FlutterSecureStorage();
+  final http.Client httpClient;
 
-  const ResourceRepository(this.resourceDataProvider);
+  ResourceDataProvider({@required this.httpClient})
+      : assert(httpClient != null);
+
+  Future<String> getToken() async {
+    return await storage.read(key: 'jwt');
+  }
 
   Future<List<Resource>> getResources(String userId) async {
-    return await resourceDataProvider.getResources('');
+    // return _fetchMockData();
+    List<Resource> resourceList = [];
+    String token = await getToken();
+    var res = await httpClient.get(
+      '$SERVER_IP/resources',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    if (res.statusCode == 200) {
+      List<dynamic> resourcesInJson = json.decode(res.body);
+      resourcesInJson
+          .forEach((resource) => resourceList.add(Resource.fromJson(resource)));
+
+      return resourceList;
+    } else {
+      throw Exception(json.decode(res.body)['message']);
+    }
   }
 
   Future<List<Category>> getCategories() async {
-    return await resourceDataProvider.getCategories();
+    List<Category> categoryList = [];
+    var res = await httpClient.get(
+      '$SERVER_IP/categories',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if (res.statusCode == 200) {
+      List<dynamic> categoriesInJson = json.decode(res.body);
+      categoriesInJson
+          .forEach((cat) => categoryList.add(Category.fromJson(cat)));
+
+      return categoryList;
+    } else {
+      throw Exception(json.decode(res.body)['message']);
+    }
   }
 
   Future<bool> createResource(
@@ -21,21 +66,69 @@ class ResourceRepository {
       String department,
       String subject,
       String fileType}) async {
-    return await resourceDataProvider.createResource(
-        filename: filename,
-        filePath: filePath,
-        year: year,
-        department: department,
-        subject: subject,
-        fileType: fileType);
+    String token = await getToken();
+
+    var request =
+        http.MultipartRequest('POST', Uri.parse('$SERVER_IP/resources'));
+
+    request.headers['Authorization'] = 'Bearer $token';
+    request.fields['name'] = filename;
+    request.fields['year'] = year;
+    request.fields['department'] = department;
+    request.fields['subject'] = subject;
+    request.fields['fileType'] = fileType;
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'files',
+        filePath,
+      ),
+    );
+    var res = await request.send();
+    // Extract String from Streamed Response
+
+    var responseString = await res.stream.bytesToString();
+    if (res.statusCode == 201) {
+      return true;
+    } else {
+      throw Exception(json.decode(responseString)['message']);
+    }
   }
 
   Future<Resource> getResource(String id) async {
-    return await resourceDataProvider.getResource(id);
+    String token = await getToken();
+    var res = await httpClient.get(
+      '$SERVER_IP/resources/$id',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    if (res.statusCode == 200) {
+      var resourceInJson = json.decode(res.body);
+
+      return Resource.fromJson(resourceInJson);
+    } else {
+      throw Exception(json.decode(res.body)['message']);
+    }
   }
 
   Future<Resource> likeUnlikeResource(String id, String action) async {
-    return await resourceDataProvider.likeUnlikeResource(id, action);
+    String token = await getToken();
+    var res = await httpClient.put(
+      '$SERVER_IP/resources/$id?action=$action',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    if (res.statusCode == 201) {
+      var resourceInJson = json.decode(res.body);
+      return Resource.fromJson(resourceInJson);
+    } else {
+      throw Exception(json.decode(res.body)['message']);
+    }
   }
 }
 

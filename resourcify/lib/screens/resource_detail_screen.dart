@@ -1,10 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:resourcify/bloc/download_resource_bloc/download_resource_bloc.dart';
 import 'package:resourcify/bloc/resource_detail/resource_detail_bloc.dart';
 import 'package:resourcify/models/models.dart';
+import 'package:resourcify/screens/screens.dart';
+import 'package:resourcify/widgets/resource_image_container.dart';
 
 class ResourceDetailScreen extends StatefulWidget {
   final Resource resource;
@@ -21,31 +25,18 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // resource = widget.resource;
-    // DateTime tempDate = new DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    //     .parse(resource.createdAt);
 
-    // tempDate = tempDate.add(tempDate.timeZoneOffset);
-    // uploadDate = DateFormat.yMEd().add_jm().format(tempDate);
-    // context.read<ResourceDetailBloc>().add(ResourceDetailInitialize());
     context
         .read<ResourceDetailBloc>()
         .add(GetResourceDetail(widget.resource.id));
+    context
+        .read<DownloadResourceBloc>()
+        .add(IsResourceDownloaded(widget.resource.files[0]));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   backgroundColor: Colors.white,
-      //   elevation: 0,
-      //   leading: IconButton(
-      //     icon: Icon(Icons.arrow_back_ios),
-      //     color: Colors.black,
-      //     onPressed: () {},
-      //   ),
-      // ),
       body: WillPopScope(
         onWillPop: () async {
           Navigator.pop(context, resource);
@@ -79,33 +70,27 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         resource.fileType == 'image'
-                            ? ClipRect(
-                                child: InteractiveViewer(
-                                    // boundaryMargin: EdgeInsets.all(20.0),
-                                    minScale: 0.1,
-                                    maxScale: 10,
-                                    child: Container(
-                                      height: 350,
-                                      child: CachedNetworkImage(
-                                        imageUrl:
-                                            "http://localhost:3000/public/${resource.files[0]}",
-                                        fit: BoxFit.fill,
-                                        progressIndicatorBuilder:
-                                            (context, url, downloadProgress) =>
-                                                Container(
-                                          height: 400,
-                                          child: Center(
-                                            child: CircularProgressIndicator(
-                                                value:
-                                                    downloadProgress.progress),
-                                          ),
-                                        ),
-                                        errorWidget: (context, url, error) =>
-                                            Icon(Icons.error),
-                                      ),
-                                    )),
+                            ? ResourceImageContainer(
+                                imageUrl: resource.files[0],
                               )
-                            : Text('Do for pdf'),
+                            : SafeArea(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.description,
+                                      size: 130,
+                                    ),
+                                    SizedBox(
+                                      height: 30,
+                                    ),
+                                    Text('File name: ${resource.files[0]}'),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                  ],
+                                ),
+                              ),
                         Container(
                           margin:
                               EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -155,43 +140,51 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                             ],
                           ),
                         ),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: CircleAvatar(
-                                radius: 30,
-                                backgroundImage: resource
-                                        .uploadedBy.profilePicture.isEmpty
-                                    ? AssetImage(
-                                        "assets/images/person_placeholder.png")
-                                    : CachedNetworkImageProvider(
-                                        resource.uploadedBy.profilePicture),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => UserProfileScreen(
+                                      userId: state.resource.uploadedBy.id,
+                                    )));
+                          },
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: resource
+                                          .uploadedBy.profilePicture.isEmpty
+                                      ? AssetImage(
+                                          "assets/images/person_placeholder.png")
+                                      : CachedNetworkImageProvider(
+                                          "http://localhost:3000/public/userProfilePictures/${resource.uploadedBy.profilePicture}"),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8.0),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    resource.uploadedBy.username,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      resource.uploadedBy.username,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    uploadDate,
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 12.0,
+                                    Text(
+                                      uploadDate,
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12.0,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         Divider(),
                         SizedBox(
@@ -244,15 +237,54 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                               label: 'Dislike',
                               onTap: () => _disLikeResource(resource),
                             ),
-                            _ReactButton(
-                              icon: Icon(
-                                Icons.download_rounded,
-                                color: Colors.green,
-                                size: 25.0,
-                              ),
-                              label: 'Download',
-                              onTap: () {},
-                            ),
+                            BlocConsumer<DownloadResourceBloc,
+                                DownloadResourceState>(
+                              listener: (ctx, state) {
+                                print(state);
+                              },
+                              builder: (ctx, state) {
+                                if (state is DownloadingResource) {
+                                  return Row(
+                                    children: [
+                                      CircularProgressIndicator(
+                                        strokeWidth: 1,
+                                        value: double.parse(state.percent),
+                                      ),
+                                      Text('Downloading'),
+                                    ],
+                                  );
+                                } else if (state is DownloadedResource) {
+                                  return _ReactButton(
+                                    icon: Icon(
+                                      Icons.description,
+                                      color: Colors.green,
+                                      size: 25.0,
+                                    ),
+                                    label: 'Open',
+                                    onTap: () async {
+                                      String dir =
+                                          (await getApplicationDocumentsDirectory())
+                                              .path;
+                                      String filePath =
+                                          '$dir/${resource.files[0]}';
+                                      OpenFile.open(filePath);
+                                    },
+                                  );
+                                }
+                                return _ReactButton(
+                                  icon: Icon(
+                                    Icons.download_outlined,
+                                    color: Colors.green,
+                                    size: 25.0,
+                                  ),
+                                  label: 'Download',
+                                  onTap: () {
+                                    context.read<DownloadResourceBloc>().add(
+                                        DownloadResource(resource.files[0]));
+                                  },
+                                );
+                              },
+                            )
                           ],
                         ),
                       ],
@@ -260,10 +292,16 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                   );
                 } else if (state is ResourceDetailLoading ||
                     state is ResourceDetailInitial) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1,
+                    ),
+                  );
                 } else {
                   return Center(
-                    child: Text('State is $state'),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1,
+                    ),
                   );
                 }
               },
@@ -326,21 +364,18 @@ class _ReactButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Material(
-        color: Colors.white,
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            height: 40.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                icon,
-                const SizedBox(width: 4.0),
-                Text(label),
-              ],
-            ),
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          height: 40.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              icon,
+              const SizedBox(width: 4.0),
+              Text(label),
+            ],
           ),
         ),
       ),
