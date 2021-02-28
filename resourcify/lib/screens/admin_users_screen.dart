@@ -89,12 +89,39 @@ class _AdminUserScreen extends State<AdminUserScreen> {
           return ListTile(
             title: Text(cat.firstName + "  " + cat.lastName),
             trailing: Icon(Icons.arrow_forward_ios),
-            onTap: null,
+            onTap: () {
+              userRoleController.text = cat.role;
+              _showChangeRoleDialog(context, cat.id, cat.role);
+            },
           );
         },
       ),
     );
   }
+
+  void _showChangeRoleDialog(context, String id, String role) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Edit role"),
+            content: Text(
+                'Do you want to change the role of this user, or delete them?'),
+            actions: [
+              FlatButton(
+                onPressed: (role == 'user') ? _makeAdmin : _makeUser,
+                child:
+                    (role == 'user') ? Text('Make admin') : Text('Make user'),
+              ),
+              FlatButton(child: Text('Delete'), onPressed: _deleteUser)
+            ],
+          );
+        });
+  }
+
+  void _deleteUser() {}
+  void _makeAdmin() {}
+  void _makeUser() {}
 
   Widget _buildCircularProgressIndicator() {
     return Center(
