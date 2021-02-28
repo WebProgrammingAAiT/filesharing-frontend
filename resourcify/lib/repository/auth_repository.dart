@@ -21,4 +21,10 @@ class AuthRepository {
   Future<void> removeJwt() async {
     return await authDataProvider.removeJwt();
   }
+
+  Future<User> signUp(String firstName, String lastName, String email,
+      String password, String confirmPassword) async {
+    return await authDataProvider.signUp(
+        firstName, lastName, email, password, confirmPassword);
+  }
 }
