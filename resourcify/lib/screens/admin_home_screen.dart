@@ -7,6 +7,7 @@ import 'package:resourcify/screens/login_screen.dart';
 import 'package:resourcify/widgets/alert_dialog_container.dart';
 
 import 'admin_department_screen.dart';
+import 'admin_users_screen.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   @override
@@ -43,6 +44,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 BlocProvider.of<AuthBloc>(context).add(RemoveJwt());
                 Navigator.pushReplacement(
                     context, MaterialPageRoute(builder: (_) => LoginScreen()));
+              }),
+          IconButton(
+              icon: Icon(Icons.people),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => AdminUserScreen()));
               })
         ],
       ),
