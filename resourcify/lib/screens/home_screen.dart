@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:resourcify/bloc/add_resource/add_resource_bloc.dart';
 import 'package:resourcify/bloc/auth_bloc.dart';
@@ -15,9 +16,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Category> categories;
+  String _currentUserId = '';
+  final storage = new FlutterSecureStorage();
+
   @override
   void initState() {
     BlocProvider.of<ResourceBloc>(context).add(FetchResources(""));
+    storage.read(key: 'userId').then((value) => setState(() {
+          _currentUserId = value;
+        }));
     super.initState();
   }
 
@@ -35,11 +42,12 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: SizedBox.shrink(),
         actions: [
           IconButton(
-              icon: Icon(Icons.logout),
+              icon: Icon(Icons.person),
               onPressed: () {
-                BlocProvider.of<AuthBloc>(context).add(RemoveJwt());
-                Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (_) => LoginScreen()));
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => UserProfileScreen(
+                          userId: _currentUserId,
+                        )));
               })
         ],
       ),

@@ -8,6 +8,7 @@ class AlertDialogContainer extends StatelessWidget {
   final String buttonName;
   final Function onActionButtonPressed;
   final String hintText;
+  final String name;
 
   const AlertDialogContainer({
     Key key,
@@ -17,6 +18,7 @@ class AlertDialogContainer extends StatelessWidget {
     this.title,
     this.buttonName,
     this.hintText,
+    this.name,
     @required this.onActionButtonPressed,
   }) : super(key: key);
   @override
@@ -24,8 +26,8 @@ class AlertDialogContainer extends StatelessWidget {
     return AlertDialog(
       title: action != null
           ? action == 'Edit'
-              ? Text('Edit resource')
-              : Text('DeleteResource')
+              ? Text('Edit $name')
+              : Text('Delete $name')
           : Text(title),
       content: Container(
         height: 150.0,
@@ -35,7 +37,7 @@ class AlertDialogContainer extends StatelessWidget {
           children: <Widget>[
             action != null
                 ? action == 'Delete'
-                    ? Text('Are you sure you want to delete this resource?')
+                    ? Text('Are you sure you want to delete this $name?')
                     : SizedBox.shrink()
                 : SizedBox.shrink(),
             TextField(

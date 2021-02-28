@@ -41,3 +41,5 @@ class AdminDepartmentUpdated extends AdminDepartmentState {
   @override
   List<Object> get props => [category];
 }
+
+class AdminDepartmentDeleted extends AdminDepartmentState {}

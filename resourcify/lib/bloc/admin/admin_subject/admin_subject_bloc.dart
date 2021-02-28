@@ -62,6 +62,14 @@ class AdminSubjectBloc extends Bloc<AdminSubjectEvent, AdminSubjectState> {
       } catch (e) {
         yield AdminSubjectError(e.toString() ?? 'An unknown error occured');
       }
+    } else if (event is DeleteSubjectCategory) {
+      try {
+        yield AdminSubjectLoading();
+        await adminRepository.deleteCategory(event.subjectId, 'subject');
+        yield AdminSubjectDeleted();
+      } catch (e) {
+        yield AdminSubjectError(e.toString() ?? 'An unknown error occured');
+      }
     }
   }
 }

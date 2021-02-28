@@ -71,19 +71,38 @@ class AdminDataProvider {
     }
   }
 
-  Future<Category> deleteCategory(String id) async {
+  Future<void> deleteCategory(String id, String categoryType) async {
     final storage = FlutterSecureStorage();
     String token = await storage.read(key: 'jwt');
 
     var res = await httpClient.delete(
-      '$SERVER_IP/categories/$id',
+      '$SERVER_IP/categories/$id?categoryType=$categoryType',
       headers: <String, String>{
         'Content-Type': 'application/djson; charset=UTF-8',
         'Authorization': 'Bearer $token'
       },
     );
-    if (res.statusCode == 204) {
-      return Category.fromJson(json.decode(res.body));
+    if (res.statusCode != 204) {
+      throw Exception(json.decode(res.body)['message']);
+    }
+  }
+
+  Future<List<Resource>> getSubjectResources(String id) async {
+    final storage = FlutterSecureStorage();
+    String token = await storage.read(key: 'jwt');
+    var res = await httpClient.get(
+      '$SERVER_IP/subjectResources/$id',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    if (res.statusCode == 200) {
+      var resourcesInJson = json.decode(res.body) as List;
+      return resourcesInJson
+          .map((resource) => Resource.fromJson(resource))
+          .toList();
     } else {
       throw Exception(json.decode(res.body)['message']);
     }

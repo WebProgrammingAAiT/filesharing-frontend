@@ -9,8 +9,11 @@ import '../models/models.dart';
 
 class ResourceWidget extends StatefulWidget {
   final Resource resource;
+  final bool isAdmin;
+  final Function onDeleteClicked;
 
-  ResourceWidget({@required this.resource});
+  ResourceWidget(
+      {@required this.resource, this.isAdmin = false, this.onDeleteClicked});
 
   @override
   _ResourceWidgetState createState() =>
@@ -52,6 +55,24 @@ class _ResourceWidgetState extends State<ResourceWidget> {
                   });
                 }
               },
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('${(resource.fileSize / 1000).toStringAsFixed(2)} kb',
+                      style: TextStyle(color: Colors.blue)),
+                  widget.isAdmin
+                      ? Expanded(
+                          child: IconButton(
+                              padding: EdgeInsets.all(0),
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                              onPressed: widget.onDeleteClicked),
+                        )
+                      : SizedBox.shrink(),
+                ],
+              ),
 
               // trailing: Column(
               //   crossAxisAlignment: CrossAxisAlignment.end,

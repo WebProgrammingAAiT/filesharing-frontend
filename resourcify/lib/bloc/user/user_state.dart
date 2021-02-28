@@ -49,3 +49,5 @@ class UserInfoUpdated extends UserState {
   const UserInfoUpdated(this.message);
   List<Object> get props => [message];
 }
+
+class UserAccountDeleted extends UserState {}

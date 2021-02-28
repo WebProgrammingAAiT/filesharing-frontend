@@ -3,10 +3,14 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:resourcify/bloc/admin/admin_bloc.dart';
+import 'package:resourcify/bloc/auth_bloc.dart';
 import 'package:resourcify/bloc/user/user_bloc.dart';
 import 'package:resourcify/models/models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:resourcify/screens/screens.dart';
+import 'package:resourcify/widgets/widgets.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final String userId;
@@ -28,12 +32,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   List<Category> categories = [];
   List<Category> departmentList = [];
   List<Category> yearList = [];
+  String _currentUserId = '';
+  final storage = new FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
     context.read<UserBloc>().add(GetUserInfo());
     context.read<AdminBloc>().add(GetCategories());
+    storage.read(key: 'userId').then((value) => setState(() {
+          _currentUserId = value;
+        }));
   }
 
   @override
@@ -57,6 +66,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: BlocConsumer<UserBloc, UserState>(
           listener: (context, state) {
             print(state);
+            if (state is UserAccountDeleted) {
+              context.read<AuthBloc>().add(RemoveJwt());
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  (Route<dynamic> route) => false);
+            }
           },
           builder: (context, state) {
             if (state is UserInfoLoaded) {
@@ -181,19 +196,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           SizedBox(
                             height: 20,
                           ),
-                          Container(
-                              width: 100,
-                              child: FlatButton(
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Container(
+                                  width: 100,
+                                  child: FlatButton(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          new BorderRadius.circular(18.0),
+                                    ),
+                                    onPressed: _submit,
+                                    color: Colors.blue,
+                                    child: Text(
+                                      "Save",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  )),
+                              Container(
+                                  // width: 100,
+                                  child: FlatButton(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: new BorderRadius.circular(18.0),
                                 ),
-                                onPressed: _submit,
-                                color: Colors.blue,
+                                onPressed: () =>
+                                    _showDeleteAccountDialog(context),
+                                color: Colors.red,
                                 child: Text(
-                                  "Save",
+                                  "Delete Account",
                                   style: TextStyle(color: Colors.white),
                                 ),
-                              ))
+                              )),
+                            ],
+                          )
                         ],
                       ),
                     ),
@@ -275,6 +310,53 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void _setDepartmentList(String id) {
     departmentList = categories.where((cat) => cat.parentId == id).toList();
+  }
+
+  // Show Dialog function
+  void _showDeleteAccountDialog(context) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Account'),
+          content: Container(
+            height: 150.0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Text(
+                    'Are you sure you want to delete this account? All the resources you created will be removed as well.'),
+                Text(
+                  'Note: This action is irreversible !!',
+                  style: TextStyle(color: Colors.redAccent),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey),
+              ),
+              onPressed: () => Navigator.pop(context),
+            ),
+            FlatButton(
+              color: Colors.red,
+              child:
+                  Text('Delete Account', style: TextStyle(color: Colors.white)),
+              onPressed: _deleteAccount,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteAccount() {
+    context.read<UserBloc>().add(DeleteUserAccount(_currentUserId));
   }
 }
 

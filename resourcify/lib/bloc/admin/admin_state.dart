@@ -48,3 +48,5 @@ class AdminYearCategoriesLoaded extends AdminState {
   AdminYearCategoriesLoaded(this.categories);
   List<Object> get props => [categories];
 }
+
+class AdminYearDeleted extends AdminState {}

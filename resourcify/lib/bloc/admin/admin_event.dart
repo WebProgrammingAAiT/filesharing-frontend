@@ -20,3 +20,8 @@ class UpdateYearCategory extends AdminEvent {
   final Category category;
   const UpdateYearCategory(this.category);
 }
+
+class DeleteYearCategory extends AdminEvent {
+  final String yearId;
+  const DeleteYearCategory(this.yearId);
+}

@@ -35,4 +35,8 @@ class UserRepository {
   Future<Resource> updateUserResource(String id, String updatedName) async {
     return await userDataProvider.updateUserResource(id, updatedName);
   }
+
+  Future<void> deleteUserAccount(String userId) async {
+    await userDataProvider.deleteUserAccount(userId);
+  }
 }
