@@ -28,6 +28,7 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
   List<Category> subjectList = [];
   File file;
   TextEditingController fileNameController = TextEditingController();
+  bool _isFileLoading = false;
   @override
   void initState() {
     super.initState();
@@ -181,22 +182,26 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
         border: Border.all(color: Colors.grey[400], width: 1),
         // color: Colors.white,
       ),
-      child: file != null
+      child: file != null || _isFileLoading
           ? widget.type == 'image'
-              ? Image.file(
-                  file,
-                  fit: BoxFit.cover,
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.description,
-                      size: 130,
-                    ),
-                    Text('Added file ${file.uri}')
-                  ],
-                )
+              ? _isFileLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : Image.file(
+                      file,
+                      fit: BoxFit.cover,
+                    )
+              : _isFileLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.description,
+                          size: 130,
+                        ),
+                        Text('Added file ${file.uri}')
+                      ],
+                    )
           : Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -281,6 +286,9 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
   }
 
   Future<void> _pickFile() async {
+    setState(() {
+      _isFileLoading = true;
+    });
     FilePickerResult result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: widget.type == 'image' ? ['jpg', 'png'] : ['pdf'],
@@ -289,9 +297,13 @@ class _AddResourceScreenState extends State<AddResourceScreen> {
     if (result != null) {
       setState(() {
         file = File(result.files.single.path);
+        _isFileLoading = false;
       });
     } else {
       // User canceled the picker
+      setState(() {
+        _isFileLoading = false;
+      });
     }
   }
 }

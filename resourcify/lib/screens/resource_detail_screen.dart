@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:resourcify/bloc/download_resource_bloc/download_resource_bloc.dart';
 import 'package:resourcify/bloc/resource_detail/resource_detail_bloc.dart';
 import 'package:resourcify/models/models.dart';
 import 'package:resourcify/screens/screens.dart';
@@ -24,12 +26,12 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
   void initState() {
     super.initState();
 
-    // BlocProvider.of<ResourceDetailBloc>(context)
-    //     .add(GetResourceDetail(widget.resource.id));
-
     context
         .read<ResourceDetailBloc>()
         .add(GetResourceDetail(widget.resource.id));
+    context
+        .read<DownloadResourceBloc>()
+        .add(IsResourceDownloaded(widget.resource.files[0]));
   }
 
   @override
@@ -71,7 +73,24 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                             ? ResourceImageContainer(
                                 imageUrl: resource.files[0],
                               )
-                            : Text('Do for pdf'),
+                            : SafeArea(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.description,
+                                      size: 130,
+                                    ),
+                                    SizedBox(
+                                      height: 30,
+                                    ),
+                                    Text('File name: ${resource.files[0]}'),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                  ],
+                                ),
+                              ),
                         Container(
                           margin:
                               EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -218,15 +237,54 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
                               label: 'Dislike',
                               onTap: () => _disLikeResource(resource),
                             ),
-                            _ReactButton(
-                              icon: Icon(
-                                Icons.download_rounded,
-                                color: Colors.green,
-                                size: 25.0,
-                              ),
-                              label: 'Download',
-                              onTap: () {},
-                            ),
+                            BlocConsumer<DownloadResourceBloc,
+                                DownloadResourceState>(
+                              listener: (ctx, state) {
+                                print(state);
+                              },
+                              builder: (ctx, state) {
+                                if (state is DownloadingResource) {
+                                  return Row(
+                                    children: [
+                                      CircularProgressIndicator(
+                                        strokeWidth: 1,
+                                        value: double.parse(state.percent),
+                                      ),
+                                      Text('Downloading'),
+                                    ],
+                                  );
+                                } else if (state is DownloadedResource) {
+                                  return _ReactButton(
+                                    icon: Icon(
+                                      Icons.description,
+                                      color: Colors.green,
+                                      size: 25.0,
+                                    ),
+                                    label: 'Open',
+                                    onTap: () async {
+                                      String dir =
+                                          (await getApplicationDocumentsDirectory())
+                                              .path;
+                                      String filePath =
+                                          '$dir/${resource.files[0]}';
+                                      OpenFile.open(filePath);
+                                    },
+                                  );
+                                }
+                                return _ReactButton(
+                                  icon: Icon(
+                                    Icons.download_outlined,
+                                    color: Colors.green,
+                                    size: 25.0,
+                                  ),
+                                  label: 'Download',
+                                  onTap: () {
+                                    context.read<DownloadResourceBloc>().add(
+                                        DownloadResource(resource.files[0]));
+                                  },
+                                );
+                              },
+                            )
                           ],
                         ),
                       ],

@@ -118,31 +118,39 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Row _buildToggleButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-        IconButton(
-          icon: Icon(Icons.image),
-          iconSize: 30,
-          color: _toggleDisplayPosts == 0 ? Colors.blueAccent : Colors.grey,
-          onPressed: () {
-            setState(() {
-              _toggleDisplayPosts = 0;
-            });
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.picture_as_pdf),
-          iconSize: 30,
-          color: _toggleDisplayPosts == 1 ? Colors.blueAccent : Colors.grey,
-          onPressed: () {
-            setState(() {
-              _toggleDisplayPosts = 1;
-            });
-          },
-        ),
-      ],
+  Widget _buildToggleButtons() {
+    return IntrinsicHeight(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.image),
+            iconSize: 30,
+            color: _toggleDisplayPosts == 0 ? Colors.blueAccent : Colors.grey,
+            onPressed: () {
+              setState(() {
+                _toggleDisplayPosts = 0;
+              });
+            },
+          ),
+          Container(
+            height: 30,
+            child: VerticalDivider(
+              color: Colors.grey,
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.picture_as_pdf),
+            iconSize: 30,
+            color: _toggleDisplayPosts == 1 ? Colors.blueAccent : Colors.grey,
+            onPressed: () {
+              setState(() {
+                _toggleDisplayPosts = 1;
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 
