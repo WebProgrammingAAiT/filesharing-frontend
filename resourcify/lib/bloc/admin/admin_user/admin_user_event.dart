@@ -18,8 +18,7 @@ class AdminRemoveAdmin extends AdminUserEvent {
 }
 
 class AdminGetUsers extends AdminUserEvent {
-  final List<User> users;
-  const AdminGetUsers(this.users);
+  const AdminGetUsers();
 }
 
 class AdminRemoveUser extends AdminUserEvent {
