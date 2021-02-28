@@ -22,7 +22,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         yield AuthLoading();
         var user = await authRepository.signIn(event.email, event.password);
         if (user != null) {
-          if (user.role == 'admin') {
+          if (user.role.name == 'admin') {
             yield AuthAdminLoaded(user);
           } else {
             yield AuthLoaded(user);

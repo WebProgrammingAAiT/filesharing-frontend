@@ -24,4 +24,24 @@ class AdminRepository {
   Future<List<Resource>> getSubjectResources(String id) async {
     return await adminDataProvider.getSubjectResources(id);
   }
+
+  Future<Role> createRole(Role role) async {
+    return await adminDataProvider.createRole(role);
+  }
+
+  Future<void> deleteRole(String id) async {
+    await adminDataProvider.deleteRole(id);
+  }
+
+  Future<List<Role>> getRoles() async {
+    return await adminDataProvider.getRoles();
+  }
+
+  Future<List<User>> getUsers() async {
+    return await adminDataProvider.getUsers();
+  }
+
+  Future<void> updateUserRole(Role role, String userId) async {
+    await adminDataProvider.updateUserRole(role, userId);
+  }
 }

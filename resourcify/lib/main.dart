@@ -12,7 +12,9 @@ import 'bloc/add_resource/add_resource_bloc.dart';
 import 'bloc/admin/admin_bloc.dart';
 import 'bloc/admin/admin_department/admin_department_bloc.dart';
 import 'bloc/admin/admin_resource/admin_resource_bloc.dart';
+import 'bloc/admin/admin_roles/admin_roles_bloc.dart';
 import 'bloc/admin/admin_subject/admin_subject_bloc.dart';
+import 'bloc/admin/admin_users/admin_users_bloc.dart';
 import 'bloc/download_resource_bloc/download_resource_bloc.dart';
 import 'bloc/resource/resource_bloc.dart';
 import 'bloc/resource_detail/resource_detail_bloc.dart';
@@ -80,6 +82,12 @@ class MyApp extends StatelessWidget {
               create: (context) => AdminSubjectBloc(this.adminRepository)),
           BlocProvider(
               create: (context) => AdminResourceBloc(this.adminRepository)),
+          BlocProvider(
+            create: (context) => AdminRolesBloc(this.adminRepository),
+          ),
+          BlocProvider(
+            create: (context) => AdminUsersBloc(this.adminRepository),
+          ),
           BlocProvider(
             create: (context) => ResourceBloc(this.resourceRepository),
           ),
