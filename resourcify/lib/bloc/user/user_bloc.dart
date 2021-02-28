@@ -72,6 +72,14 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       } catch (e) {
         yield UserError(e.toString() ?? 'An unknown error occured');
       }
+    } else if (event is DeleteUserAccount) {
+      yield UserLoading();
+      try {
+        await userRepository.deleteUserAccount(event.userId);
+        yield UserAccountDeleted();
+      } catch (e) {
+        yield UserError(e.toString() ?? 'An unknown error occured');
+      }
     }
   }
 }

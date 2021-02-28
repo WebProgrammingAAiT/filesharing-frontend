@@ -131,4 +131,19 @@ class UserDataProvider {
       throw Exception(json.decode(res.body)['message']);
     }
   }
+
+  Future<void> deleteUserAccount(String userId) async {
+    String token = await getToken();
+    var res = await httpClient.delete(
+      '$SERVER_IP/users/$userId',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    if (res.statusCode != 204) {
+      throw Exception(json.decode(res.body)['message']);
+    }
+  }
 }

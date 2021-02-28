@@ -47,3 +47,8 @@ class DeleteUserResource extends UserEvent {
   final String id;
   DeleteUserResource(this.id);
 }
+
+class DeleteUserAccount extends UserEvent {
+  final String userId;
+  DeleteUserAccount(this.userId);
+}

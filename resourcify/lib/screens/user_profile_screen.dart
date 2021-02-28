@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:resourcify/bloc/auth_bloc.dart';
 import 'package:resourcify/bloc/user/user_bloc.dart';
 import 'package:resourcify/models/models.dart';
 import 'package:resourcify/screens/screens.dart';
@@ -53,7 +54,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ? IconButton(
                   color: Colors.white,
                   icon: Icon(Icons.exit_to_app),
-                  onPressed: () {},
+                  onPressed: () {
+                    BlocProvider.of<AuthBloc>(context).add(RemoveJwt());
+                    // Navigator.pushReplacement(
+                    //     context, MaterialPageRoute(builder: (_) => LoginScreen()));
+                    Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                        (Route<dynamic> route) => false);
+                  },
                 )
               : SizedBox.shrink()
         ],
@@ -62,6 +70,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         listener: (context, state) {
           print(state);
           if (state is UserResourcesLoaded) {
+            if (state.resources.length == 0) {
+              context.read<UserBloc>().add(GetUserInfo());
+            }
             _numberOfPost = state.resources.length;
           } else if (state is UserResourceUpdated) {
             Scaffold.of(context).showSnackBar(
@@ -100,13 +111,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         },
         builder: (context, state) {
           if (state is UserResourcesLoaded) {
-            return ListView(
-              children: [
-                _upperHalf(state.resources[0].uploadedBy),
-                _buildToggleButtons(),
-                _lowerHalf(state.resources),
-              ],
-            );
+            if (state.resources.length > 0) {
+              return ListView(
+                children: [
+                  _upperHalf(state.resources[0].uploadedBy),
+                  _buildToggleButtons(),
+                  _lowerHalf(state.resources),
+                ],
+              );
+            }
+          }
+          if (state is UserInfoLoaded) {
+            return ListView(children: [
+              _upperHalf(state.user),
+            ]);
           }
           return Center(
             child: CircularProgressIndicator(
