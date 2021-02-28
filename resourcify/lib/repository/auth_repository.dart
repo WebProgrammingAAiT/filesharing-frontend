@@ -11,7 +11,7 @@ abstract class AuthRepository {
 }
 
 class AuthRepositoryImpl implements AuthRepository {
-  static const String SERVER_IP = 'http://localhost:8080/api';
+  static const String SERVER_IP = 'http://localhost:3000/api';
   // Create storage
   final storage = new FlutterSecureStorage();
 

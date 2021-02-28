@@ -76,7 +76,7 @@ class _ResourceWidgetState extends State<ResourceWidget> {
                       width: 80,
                       child: CachedNetworkImage(
                         imageUrl:
-                            "http://localhost:8080/public/${resource.files[0]}",
+                            "http://localhost:3000/public/${resource.files[0]}",
                         fit: BoxFit.cover,
                         progressIndicatorBuilder:
                             (context, url, downloadProgress) => Center(

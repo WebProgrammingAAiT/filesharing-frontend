@@ -4,6 +4,7 @@ import 'package:resourcify/bloc/auth_bloc.dart';
 import 'package:resourcify/repository/admin_repository.dart';
 import 'package:resourcify/repository/auth_repository.dart';
 import 'package:resourcify/repository/resource_repository.dart';
+import 'package:resourcify/data_provider/resource_date_provider.dart';
 import 'package:resourcify/screens/admin_home_screen.dart';
 import 'package:resourcify/screens/home_screen.dart';
 import 'package:resourcify/screens/screens.dart';
@@ -37,13 +38,16 @@ class MyApp extends StatelessWidget {
             create: (context) => AdminSubjectBloc(AdminRepositoryImpl()),
           ),
           BlocProvider(
-            create: (context) => ResourceBloc(ResourceRepositoryImpl()),
+            create: (context) =>
+                ResourceBloc(ResourceRepository(ResourceDataProviderImpl())),
           ),
           BlocProvider(
-            create: (context) => AddResourceBloc(ResourceRepositoryImpl()),
+            create: (context) =>
+                AddResourceBloc(ResourceRepository(ResourceDataProviderImpl())),
           ),
           BlocProvider(
-            create: (context) => ResourceDetailBloc(ResourceRepositoryImpl()),
+            create: (context) => ResourceDetailBloc(
+                ResourceRepository(ResourceDataProviderImpl())),
           ),
         ],
         child: MaterialApp(
