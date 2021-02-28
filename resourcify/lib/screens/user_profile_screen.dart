@@ -427,6 +427,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       builder: (BuildContext context) {
         return AlertDialogContainer(
           context: context,
+          name: 'resource',
           action: action,
           controller: _resourceEditController,
           onActionButtonPressed: () =>

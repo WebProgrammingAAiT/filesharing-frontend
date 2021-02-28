@@ -52,7 +52,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           if (state is AdminYearCreated) {
             Scaffold.of(context).showSnackBar(
               SnackBar(
-                content: Text('Category created successfully!'),
+                content: Text('Year created successfully!'),
               ),
             );
             BlocProvider.of<AdminBloc>(context).add(GetCategories());
@@ -65,7 +65,14 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           } else if (state is AdminYearUpdated) {
             Scaffold.of(context).showSnackBar(
               SnackBar(
-                content: Text('Category updated successfully!'),
+                content: Text('Year updated successfully!'),
+              ),
+            );
+            BlocProvider.of<AdminBloc>(context).add(GetCategories());
+          } else if (state is AdminYearDeleted) {
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Year deleted successfully!'),
               ),
             );
             BlocProvider.of<AdminBloc>(context).add(GetCategories());

@@ -17,6 +17,9 @@ class AdminDepartmentScreen extends StatefulWidget {
 class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
   TextEditingController departmentController = TextEditingController();
   TextEditingController editYearController = TextEditingController();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  List<Category> departmentCategories;
 
   @override
   void initState() {
@@ -28,6 +31,7 @@ class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(widget.year.name),
         actions: [
@@ -35,14 +39,25 @@ class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
               icon: Icon(Icons.edit),
               onPressed: () {
                 editYearController.text = widget.year.name;
-                _showEditYearDialog(context);
-              })
+                _showEditDeleteYearDialog(context, 'Edit');
+              }),
+          IconButton(
+            icon: Icon(
+              Icons.delete,
+              color: Colors.red,
+            ),
+            onPressed: () {
+              editYearController.text = widget.year.name;
+              _showEditDeleteYearDialog(context, 'Delete');
+            },
+          ),
         ],
       ),
       body: BlocListener<AdminBloc, AdminState>(
         listener: (context, state) {
-          print("State in depscreen $state");
           if (state is AdminYearUpdated) {
+            Navigator.pop(context);
+          } else if (state is AdminYearDeleted) {
             Navigator.pop(context);
           }
         },
@@ -52,7 +67,7 @@ class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
             if (state is AdminDepartmentCreated) {
               Scaffold.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Category created successfully!'),
+                  content: Text('Department created successfully!'),
                 ),
               );
               BlocProvider.of<AdminDepartmentBloc>(context)
@@ -60,7 +75,15 @@ class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
             } else if (state is AdminDepartmentUpdated) {
               Scaffold.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Category updated successfully!'),
+                  content: Text('Department updated successfully!'),
+                ),
+              );
+              BlocProvider.of<AdminDepartmentBloc>(context)
+                  .add(GetDepartmentCategories(widget.year.id));
+            } else if (state is AdminDepartmentDeleted) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Department deleted Successfully'),
                 ),
               );
               BlocProvider.of<AdminDepartmentBloc>(context)
@@ -78,7 +101,7 @@ class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
                 state is AdminDepartmentLoading) {
               return _buildCircularProgressIndicator();
             } else if (state is AdminDepartmentCategoriesLoaded) {
-              List<Category> departmentCategories = state.categories;
+              this.departmentCategories = state.categories;
               return ListView.builder(
                 itemCount: departmentCategories.length,
                 itemBuilder: (BuildContext context, int index) {
@@ -121,6 +144,44 @@ class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
   }
 
   // Show Dialog function
+  void _showEditDeleteYearDialog(context, String action) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialogContainer(
+          context: context,
+          name: 'Year',
+          action: action,
+          controller: editYearController,
+          onActionButtonPressed: () => _updateDeleteYear(action),
+        );
+      },
+    );
+  }
+
+  void _updateDeleteYear(String action) {
+    if (editYearController.text.trim().isNotEmpty) {
+      if (action == 'Edit') {
+        BlocProvider.of<AdminBloc>(context).add(UpdateYearCategory(
+            Category(name: editYearController.text, id: widget.year.id)));
+      } else {
+        if (departmentCategories == null || departmentCategories.length > 0) {
+          SnackBar snackbar = SnackBar(
+            content: Text('Please remove each departments first'),
+          );
+          _scaffoldKey.currentState.showSnackBar(snackbar);
+        } else {
+          BlocProvider.of<AdminBloc>(context)
+              .add(DeleteYearCategory(widget.year.id));
+        }
+      }
+
+      Navigator.pop(context);
+    }
+  }
+
+  // Show Dialog function
   void _showCreateDepartmentDialog(context) {
     showDialog(
       context: context,
@@ -132,24 +193,6 @@ class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
             context: context,
             controller: departmentController,
             onActionButtonPressed: _createCategory);
-      },
-    );
-  }
-
-  // Show Dialog function
-  void _showEditYearDialog(context) {
-    // flutter defined function
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialogContainer(
-            title: 'Edit department',
-            hintText: 'Department',
-            buttonName: 'Update',
-            context: context,
-            controller: editYearController,
-            onActionButtonPressed: _updateYear);
       },
     );
   }
@@ -166,16 +209,6 @@ class _AdminDepartmentScreenState extends State<AdminDepartmentScreen> {
       BlocProvider.of<AdminDepartmentBloc>(context)
           .add(CreateDepartmentCategory(newCategory));
       Navigator.of(context).pop();
-    }
-  }
-
-  void _updateYear() {
-    if (editYearController.text.trim().isNotEmpty &&
-        widget.year.id.isNotEmpty) {
-      BlocProvider.of<AdminBloc>(context).add(UpdateYearCategory(
-          Category(name: editYearController.text, id: widget.year.id)));
-
-      Navigator.pop(context);
     }
   }
 }

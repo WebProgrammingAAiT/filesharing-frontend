@@ -27,7 +27,7 @@ class ResourceDetailBloc
       }
     } else if (event is LikeResource) {
       try {
-        yield ResourceDetailLoading();
+        // yield ResourceDetailLoading();
         Resource resource =
             await resourceRepository.likeUnlikeResource(event.id, 'like');
         yield ResourceDetailLoaded(resource);
@@ -36,7 +36,7 @@ class ResourceDetailBloc
       }
     } else if (event is DislikeResource) {
       try {
-        yield ResourceDetailLoading();
+        // yield ResourceDetailLoading();
         Resource resource =
             await resourceRepository.likeUnlikeResource(event.id, 'dislike');
         yield ResourceDetailLoaded(resource);
@@ -45,7 +45,7 @@ class ResourceDetailBloc
       }
     } else if (event is UnLikeResource) {
       try {
-        yield ResourceDetailLoading();
+        // yield ResourceDetailLoading();
         Resource resource =
             await resourceRepository.likeUnlikeResource(event.id, 'removeLike');
         yield ResourceDetailLoaded(resource);
@@ -54,7 +54,7 @@ class ResourceDetailBloc
       }
     } else if (event is UnDislikeResource) {
       try {
-        yield ResourceDetailLoading();
+        // yield ResourceDetailLoading();
         Resource resource = await resourceRepository.likeUnlikeResource(
             event.id, 'removeDislike');
         yield ResourceDetailLoaded(resource);
@@ -63,7 +63,7 @@ class ResourceDetailBloc
       }
     } else if (event is RemoveLikeThenDislikeResource) {
       try {
-        yield ResourceDetailLoading();
+        // yield ResourceDetailLoading();
         Resource resource = await resourceRepository.likeUnlikeResource(
             event.id, 'removeLikeThenDislike');
         yield ResourceDetailLoaded(resource);
@@ -72,7 +72,7 @@ class ResourceDetailBloc
       }
     } else if (event is RemoveDislikeThenLikeResource) {
       try {
-        yield ResourceDetailLoading();
+        // yield ResourceDetailLoading();
         Resource resource = await resourceRepository.likeUnlikeResource(
             event.id, 'removeDislikeThenLike');
         yield ResourceDetailLoaded(resource);

@@ -21,3 +21,8 @@ class GetDepartmentCategories extends AdminDepartmentEvent {
   final String yearId;
   const GetDepartmentCategories(this.yearId);
 }
+
+class DeleteDepartmentCategory extends AdminDepartmentEvent {
+  final String departmentId;
+  const DeleteDepartmentCategory(this.departmentId);
+}

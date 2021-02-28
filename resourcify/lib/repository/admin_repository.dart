@@ -17,7 +17,11 @@ class AdminRepository {
     return await adminDataProvider.updateCategory(category);
   }
 
-  Future<Category> deleteCategory(String id) async {
-    return await adminDataProvider.deleteCategory(id);
+  Future<void> deleteCategory(String id, String categoryType) async {
+    await adminDataProvider.deleteCategory(id, categoryType);
+  }
+
+  Future<List<Resource>> getSubjectResources(String id) async {
+    return await adminDataProvider.getSubjectResources(id);
   }
 }

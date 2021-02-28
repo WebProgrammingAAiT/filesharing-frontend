@@ -62,6 +62,14 @@ class AdminDepartmentBloc
       } catch (e) {
         yield AdminDepartmentError(e.toString() ?? 'An unknown error occured');
       }
+    } else if (event is DeleteDepartmentCategory) {
+      try {
+        yield AdminDepartmentLoading();
+        await adminRepository.deleteCategory(event.departmentId, 'department');
+        yield AdminDepartmentDeleted();
+      } catch (e) {
+        yield AdminDepartmentError(e.toString() ?? 'An unknown error occured');
+      }
     }
   }
 }

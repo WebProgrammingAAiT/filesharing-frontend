@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:resourcify/bloc/admin/admin_department/admin_department_bloc.dart';
 import 'package:resourcify/bloc/admin/admin_subject/admin_subject_bloc.dart';
 import 'package:resourcify/models/models.dart';
+import 'package:resourcify/screens/admin_resources_screen.dart';
 import 'package:resourcify/widgets/alert_dialog_container.dart';
 
 class AdminSubjectScreen extends StatefulWidget {
@@ -15,10 +16,9 @@ class AdminSubjectScreen extends StatefulWidget {
 
 class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
   TextEditingController subjectController = TextEditingController();
-  TextEditingController editSubjectController = TextEditingController();
-
   TextEditingController departmentController = TextEditingController();
-
+  List<Category> subjectCategories;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   void initState() {
     BlocProvider.of<AdminSubjectBloc>(context)
@@ -29,6 +29,7 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(widget.department.name),
         actions: [
@@ -36,7 +37,17 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
             icon: Icon(Icons.edit),
             onPressed: () {
               departmentController.text = widget.department.name;
-              _showEditDepartmentDialog(context);
+              _showEditDeleteDepartmentDialog(context, 'Edit');
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.delete,
+              color: Colors.red,
+            ),
+            onPressed: () {
+              departmentController.text = widget.department.name;
+              _showEditDeleteDepartmentDialog(context, 'Delete');
             },
           ),
         ],
@@ -44,6 +55,8 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
       body: BlocListener<AdminDepartmentBloc, AdminDepartmentState>(
           listener: (context, state) {
             if (state is AdminDepartmentUpdated) {
+              Navigator.pop(context);
+            } else if (state is AdminDepartmentDeleted) {
               Navigator.pop(context);
             }
           },
@@ -53,7 +66,7 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
               if (state is AdminSubjectCreated) {
                 Scaffold.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Category created successfully!'),
+                    content: Text('Subject created successfully!'),
                   ),
                 );
                 BlocProvider.of<AdminSubjectBloc>(context)
@@ -67,7 +80,15 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
               } else if (state is AdminSubjectUpdated) {
                 Scaffold.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Category updated successfully!'),
+                    content: Text('Subject updated successfully!'),
+                  ),
+                );
+                BlocProvider.of<AdminSubjectBloc>(context)
+                    .add(GetSubjectCategories(widget.department.id));
+              } else if (state is AdminSubjectDeleted) {
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Subject deleted successfully!'),
                   ),
                 );
                 BlocProvider.of<AdminSubjectBloc>(context)
@@ -79,7 +100,7 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
                   state is AdminSubjectLoading) {
                 return _buildCircularProgressIndicator();
               } else if (state is AdminSubjectCategoriesLoaded) {
-                List<Category> subjectCategories = state.categories;
+                this.subjectCategories = state.categories;
 
                 return ListView.builder(
                   itemCount: subjectCategories.length,
@@ -88,8 +109,13 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
                     return ListTile(
                       title: Text(subject.name),
                       onTap: () {
-                        editSubjectController.text = subject.name;
-                        _showEditSubjectDialog(context, subject.id);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                AdminResourcesScreen(subject: subject),
+                          ),
+                        );
                       },
                     );
                   },
@@ -132,35 +158,42 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
   }
 
   // Show Dialog function
-  void _showEditSubjectDialog(context, String subjectId) {
+  void _showEditDeleteDepartmentDialog(context, String action) {
+    // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialogContainer(
-            title: 'Edit subject',
-            hintText: 'Subject',
-            buttonName: 'Update',
-            context: context,
-            controller: editSubjectController,
-            onActionButtonPressed: () => _updateSubject(subjectId));
+          context: context,
+          name: 'Department',
+          action: action,
+          controller: departmentController,
+          onActionButtonPressed: () => _updateDeleteDepartment(action),
+        );
       },
     );
   }
 
-  // Show Dialog function
-  void _showEditDepartmentDialog(context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialogContainer(
-            title: 'Edit department',
-            hintText: 'Department',
-            buttonName: 'Update',
-            context: context,
-            controller: departmentController,
-            onActionButtonPressed: _updateDepartment);
-      },
-    );
+  void _updateDeleteDepartment(String action) {
+    if (departmentController.text.trim().isNotEmpty) {
+      if (action == 'Edit') {
+        BlocProvider.of<AdminDepartmentBloc>(context).add(
+            UpdateDepartmentCategory(Category(
+                name: departmentController.text, id: widget.department.id)));
+      } else {
+        if (subjectCategories == null || subjectCategories.length > 0) {
+          SnackBar snackbar = SnackBar(
+            content: Text('Please remove each subjects first'),
+          );
+          _scaffoldKey.currentState.showSnackBar(snackbar);
+        } else {
+          BlocProvider.of<AdminDepartmentBloc>(context)
+              .add(DeleteDepartmentCategory(widget.department.id));
+        }
+      }
+
+      Navigator.pop(context);
+    }
   }
 
   void _createCategory() {
@@ -176,25 +209,6 @@ class _AdminSubjectScreenState extends State<AdminSubjectScreen> {
       BlocProvider.of<AdminSubjectBloc>(context)
           .add(CreateSubjectCategory(newCategory));
       Navigator.of(context).pop();
-    }
-  }
-
-  void _updateSubject(String subjectId) {
-    if (editSubjectController.text.trim().isNotEmpty && subjectId.isNotEmpty) {
-      BlocProvider.of<AdminSubjectBloc>(context).add(UpdateSubjectCategory(
-          Category(name: editSubjectController.text, id: subjectId)));
-      Navigator.pop(context);
-    }
-  }
-
-  void _updateDepartment() {
-    if (departmentController.text.trim().isNotEmpty &&
-        widget.department.id.isNotEmpty) {
-      BlocProvider.of<AdminDepartmentBloc>(context).add(
-          UpdateDepartmentCategory(Category(
-              name: departmentController.text, id: widget.department.id)));
-
-      Navigator.pop(context);
     }
   }
 }

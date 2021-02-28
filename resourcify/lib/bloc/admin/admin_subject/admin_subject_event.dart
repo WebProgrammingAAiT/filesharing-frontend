@@ -21,3 +21,8 @@ class GetSubjectCategories extends AdminSubjectEvent {
   final String departmentId;
   const GetSubjectCategories(this.departmentId);
 }
+
+class DeleteSubjectCategory extends AdminSubjectEvent {
+  final String subjectId;
+  const DeleteSubjectCategory(this.subjectId);
+}

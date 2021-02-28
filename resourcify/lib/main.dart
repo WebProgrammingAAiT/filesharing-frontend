@@ -11,6 +11,7 @@ import 'package:resourcify/screens/screens.dart';
 import 'bloc/add_resource/add_resource_bloc.dart';
 import 'bloc/admin/admin_bloc.dart';
 import 'bloc/admin/admin_department/admin_department_bloc.dart';
+import 'bloc/admin/admin_resource/admin_resource_bloc.dart';
 import 'bloc/admin/admin_subject/admin_subject_bloc.dart';
 import 'bloc/download_resource_bloc/download_resource_bloc.dart';
 import 'bloc/resource/resource_bloc.dart';
@@ -77,6 +78,8 @@ class MyApp extends StatelessWidget {
               create: (context) => AdminDepartmentBloc(this.adminRepository)),
           BlocProvider(
               create: (context) => AdminSubjectBloc(this.adminRepository)),
+          BlocProvider(
+              create: (context) => AdminResourceBloc(this.adminRepository)),
           BlocProvider(
             create: (context) => ResourceBloc(this.resourceRepository),
           ),
