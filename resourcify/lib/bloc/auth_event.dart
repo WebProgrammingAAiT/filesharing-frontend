@@ -14,6 +14,17 @@ class SignIn extends AuthEvent {
   const SignIn(this.email, this.password);
 }
 
+class SignUp extends AuthEvent {
+  final String firstName;
+  final String lastName;
+  final String email;
+  final String password;
+  final String confirmPassword;
+
+  const SignUp(this.firstName, this.lastName, this.email, this.password,
+      this.confirmPassword);
+}
+
 class CheckJwtExists extends AuthEvent {
   const CheckJwtExists();
 }

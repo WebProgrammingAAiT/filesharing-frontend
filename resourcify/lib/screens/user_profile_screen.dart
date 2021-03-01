@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:resourcify/bloc/admin/admin_bloc.dart';
 import 'package:resourcify/bloc/auth_bloc.dart';
 import 'package:resourcify/bloc/user/user_bloc.dart';
 import 'package:resourcify/models/models.dart';
@@ -25,6 +26,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   String _currentUserId = '';
   final storage = new FlutterSecureStorage();
   TextEditingController _resourceEditController = TextEditingController();
+  Category year;
+  Category department;
+  Category subject;
+  List<Category> categories = [];
+  List<Category> departmentList = [];
+  List<Category> yearList = [];
+  List<Category> subjectList = [];
 
   @override
   void initState() {
@@ -33,6 +41,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           _currentUserId = value;
         }));
     context.read<UserBloc>().add(GetUserResources(widget.userId));
+    context.read<AdminBloc>().add(GetCategories());
   }
 
   @override
@@ -66,72 +75,80 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               : SizedBox.shrink()
         ],
       ),
-      body: BlocConsumer<UserBloc, UserState>(
+      body: BlocListener<AdminBloc, AdminState>(
         listener: (context, state) {
-          print(state);
-          if (state is UserResourcesLoaded) {
-            if (state.resources.length == 0) {
-              context.read<UserBloc>().add(GetUserInfo());
-            }
-            _numberOfPost = state.resources.length;
-          } else if (state is UserResourceUpdated) {
-            Scaffold.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Resource updated successfully!'),
-              ),
-            );
-            BlocProvider.of<UserBloc>(context)
-                .add(GetUserResources(widget.userId));
-          } else if (state is UserResourceDeleted) {
-            Scaffold.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Resource deleted successfully!'),
-              ),
-            );
-            BlocProvider.of<UserBloc>(context)
-                .add(GetUserResources(widget.userId));
-          } else if (state is UserInfoUpdated) {
-            Scaffold.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-              ),
-            );
-            BlocProvider.of<UserBloc>(context)
-                .add(GetUserResources(widget.userId));
-          } else if (state is UserError) {
-            print(state.message);
-            Scaffold.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-              ),
-            );
-            BlocProvider.of<UserBloc>(context)
-                .add(GetUserResources(widget.userId));
+          if (state is AdminCategoriesLoaded) {
+            categories = state.categories;
+            yearList = categories.where((cat) => cat.type == 'year').toList();
           }
         },
-        builder: (context, state) {
-          if (state is UserResourcesLoaded) {
-            if (state.resources.length > 0) {
-              return ListView(
-                children: [
-                  _upperHalf(state.resources[0].uploadedBy),
-                  _buildToggleButtons(),
-                  _lowerHalf(state.resources),
-                ],
+        child: BlocConsumer<UserBloc, UserState>(
+          listener: (context, state) {
+            print(state);
+            if (state is UserResourcesLoaded) {
+              if (state.resources.length == 0) {
+                context.read<UserBloc>().add(GetUserInfo());
+              }
+              _numberOfPost = state.resources.length;
+            } else if (state is UserResourceUpdated) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Resource updated successfully!'),
+                ),
               );
+              BlocProvider.of<UserBloc>(context)
+                  .add(GetUserResources(widget.userId));
+            } else if (state is UserResourceDeleted) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Resource deleted successfully!'),
+                ),
+              );
+              BlocProvider.of<UserBloc>(context)
+                  .add(GetUserResources(widget.userId));
+            } else if (state is UserInfoUpdated) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                ),
+              );
+              BlocProvider.of<UserBloc>(context)
+                  .add(GetUserResources(widget.userId));
+            } else if (state is UserError) {
+              print(state.message);
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                ),
+              );
+              BlocProvider.of<UserBloc>(context)
+                  .add(GetUserResources(widget.userId));
             }
-          }
-          if (state is UserInfoLoaded) {
-            return ListView(children: [
-              _upperHalf(state.user),
-            ]);
-          }
-          return Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 1,
-            ),
-          );
-        },
+          },
+          builder: (context, state) {
+            if (state is UserResourcesLoaded) {
+              if (state.resources.length > 0) {
+                return ListView(
+                  children: [
+                    _upperHalf(state.resources[0].uploadedBy),
+                    _buildToggleButtons(),
+                    _lowerHalf(state.resources),
+                  ],
+                );
+              }
+            }
+            if (state is UserInfoLoaded) {
+              return ListView(children: [
+                _upperHalf(state.user),
+              ]);
+            }
+            return Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 1,
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -393,9 +410,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       key: _key,
       onSelected: (String value) {
         if (value == 'edit') {
-          _showEditDeleteResourceDialog(context, resource.id, 'Edit');
+          _showEditDeleteResourceDialog(context, resource, 'Edit');
         } else {
-          _showEditDeleteResourceDialog(context, resource.id, 'Delete');
+          _showEditDeleteResourceDialog(context, resource, 'Delete');
         }
       },
       child: IconButton(
@@ -420,32 +437,198 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   // Show Dialog function
   void _showEditDeleteResourceDialog(
-      context, String resourceId, String action) {
+      context, Resource resource, String action) {
     // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialogContainer(
-          context: context,
-          name: 'resource',
-          action: action,
-          controller: _resourceEditController,
-          onActionButtonPressed: () =>
-              _updateDeleteResource(resourceId, action),
-        );
+        return StatefulBuilder(builder: (context, dialogState) {
+          return AlertDialog(
+            title: action == 'Edit'
+                ? Text('Edit resource')
+                : Text('Are you sure you want to delete this resource?'),
+            content: SingleChildScrollView(
+              child: action == 'Edit'
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          enabled: true,
+                          controller: _resourceEditController,
+                          textCapitalization: TextCapitalization.words,
+                        ),
+                        _BuildDropdownWidget(
+                          resource: resource,
+                          title: 'Year',
+                          value: year,
+                          categoryList: yearList,
+                          onSelected: (cat) {
+                            dialogState(() {
+                              year = cat;
+                              department = null;
+                              departmentList.clear();
+                            });
+                            _setDepartmentList(cat.id);
+                          },
+                        ),
+                        _BuildDropdownWidget(
+                          resource: resource,
+                          title: 'Department',
+                          value: department,
+                          categoryList: departmentList,
+                          onSelected: (cat) {
+                            dialogState(() {
+                              department = cat;
+                              subject = null;
+                              subjectList.clear();
+                            });
+                            _setSubjectList(cat.id);
+                          },
+                        ),
+                        _BuildDropdownWidget(
+                          resource: resource,
+                          title: 'Subject',
+                          value: subject,
+                          categoryList: subjectList,
+                          onSelected: (cat) {
+                            dialogState(() {
+                              subject = cat;
+                            });
+                          },
+                        ),
+                      ],
+                    )
+                  : TextField(
+                      enabled: false,
+                      controller: _resourceEditController,
+                      textCapitalization: TextCapitalization.words,
+                    ),
+            ),
+            actions: [
+              TextButton(
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
+              TextButton(
+                child: action == 'Edit'
+                    ? Text('Update')
+                    : Text('Delete', style: TextStyle(color: Colors.red)),
+                onPressed: () {
+                  _updateDeleteResource(resource.id, action);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
       },
     );
   }
 
+  void _setDepartmentList(String id) {
+    departmentList = categories.where((cat) => cat.parentId == id).toList();
+  }
+
+  void _setSubjectList(String id) {
+    subjectList = categories.where((cat) => cat.parentId == id).toList();
+  }
+
   void _updateDeleteResource(String resourceId, String action) {
     if (_resourceEditController.text.trim().isNotEmpty) {
+      String departmentId = '';
+      String yearId = '';
+      String subjectId = '';
+      if (year != null) {
+        yearId = year.id;
+      }
+      if (department != null) {
+        departmentId = department.id;
+      }
+      if (subject != null) {
+        subjectId = subject.id;
+      }
+      Resource updateResource = Resource(
+        id: resourceId,
+        year: yearId,
+        department: departmentId,
+        subject: subjectId,
+        resourceName: _resourceEditController.text,
+      );
+      departmentList.clear();
+      subjectList.clear();
+      year = null;
+      department = null;
+      subjectId = null;
+
       action == 'Edit'
           ? BlocProvider.of<UserBloc>(context)
-              .add(UpdateUserResource(resourceId, _resourceEditController.text))
+              .add(UpdateUserResource(updateResource))
           : BlocProvider.of<UserBloc>(context)
-              .add(DeleteUserResource(resourceId));
-
-      Navigator.pop(context);
+              .add(DeleteUserResource(updateResource.id));
     }
+  }
+}
+
+class _BuildDropdownWidget extends StatelessWidget {
+  final Resource resource;
+  final String title;
+  final Category value;
+  final List<Category> categoryList;
+  final Function onSelected;
+
+  const _BuildDropdownWidget(
+      {Key key,
+      this.resource,
+      this.title,
+      this.value,
+      this.onSelected,
+      this.categoryList})
+      : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          alignment: Alignment.topLeft,
+          margin: EdgeInsets.symmetric(vertical: 10),
+          child: Text(
+            title,
+            style: TextStyle(
+                // color: Colors.black54,
+                // fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+                fontSize: 16),
+          ),
+        ),
+        Container(
+          // margin: EdgeInsets.only(left: 40, right: 90),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black12, width: 1),
+          ),
+          child: DropdownButton<Category>(
+            isExpanded: true,
+            hint: title == 'Year'
+                ? Text(resource.year)
+                : title == 'Department'
+                    ? Text(resource.department)
+                    : Text(resource.subject),
+            underline: SizedBox.shrink(),
+            value: value,
+            onChanged: onSelected,
+            items: categoryList
+                .map<DropdownMenuItem<Category>>((Category category) {
+              return DropdownMenuItem<Category>(
+                value: category,
+                child: Text(category.name),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
   }
 }

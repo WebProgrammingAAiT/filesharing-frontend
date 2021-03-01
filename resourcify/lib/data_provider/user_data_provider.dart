@@ -60,14 +60,19 @@ class UserDataProvider {
     }
   }
 
-  Future<Resource> updateUserResource(String id, String updatedName) async {
+  Future<Resource> updateUserResource(Resource resource) async {
     String token = await getToken();
-    var res = await httpClient.put('$SERVER_IP/resources/$id/update',
+    var res = await httpClient.put('$SERVER_IP/resources/${resource.id}/update',
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token'
         },
-        body: jsonEncode(<String, String>{"name": updatedName}));
+        body: jsonEncode(<String, String>{
+          "name": resource.resourceName,
+          'year': resource.year,
+          'department': resource.department,
+          'subject': resource.subject
+        }));
 
     if (res.statusCode == 201) {
       var resourceInJson = json.decode(res.body);

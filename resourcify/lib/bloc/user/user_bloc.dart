@@ -58,7 +58,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       yield UserLoading();
       try {
         Resource resource =
-            await userRepository.updateUserResource(event.id, event.name);
+            await userRepository.updateUserResource(event.resource);
 
         yield UserResourceUpdated(resource);
       } catch (e) {

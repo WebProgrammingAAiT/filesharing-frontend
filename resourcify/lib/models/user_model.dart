@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:resourcify/models/role_model.dart';
 
 class User extends Equatable {
   final String id;
@@ -7,7 +8,7 @@ class User extends Equatable {
   final String email;
   final String password;
   final String username;
-  final String role;
+  final Role role;
   final String profilePicture;
   final String year;
   final String department;
@@ -32,7 +33,7 @@ class User extends Equatable {
         lastName: json['lastName'],
         email: json['email'],
         password: json['password'] ?? '',
-        role: json['role'],
+        role: json['role'] != null ? Role.fromJson(json['role']) : Role(),
         username: json['username'],
         year: json['year'] != null ? json['year']['name'] : '',
         department:

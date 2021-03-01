@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:resourcify/screens/constants.dart';
 import 'package:resourcify/screens/login_screen.dart';
+import 'package:resourcify/bloc/auth_bloc.dart';
+import 'package:resourcify/screens/screens.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -9,6 +12,12 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   bool _passwordVisible;
+  TextEditingController _firstNameController = TextEditingController();
+  TextEditingController _lastNameController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  TextEditingController _confirmPasswordController = TextEditingController();
+
   @override
   void initState() {
     _passwordVisible = false;
@@ -18,55 +27,85 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
+        body: BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthError) {
+          Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+            ),
+          );
+        } else if (state is AuthLoaded) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => HomeScreen()));
+        }
+      },
+      builder: (context, state) {
+        if (state is AuthNotLoggedIn || state is AuthJwtRemoved) {
+          return _buildInitialState();
+        } else if (state is AuthLoading) {
+          return Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 1,
+            ),
+          );
+        } else if (state is AuthError) {
+          return _buildInitialState();
+        } else
+          return SizedBox.shrink();
+      },
+    ));
+  }
+
+  Widget _buildInitialState() {
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Color(0xff3967D6),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.elliptical(500, 300),
+                  bottomRight: Radius.elliptical(520, 300),
+                ),
+              ),
+              height: 200,
+            ),
+            SizedBox(
+              height: 80,
+            ),
+            Container(
+              alignment: Alignment.center,
+              child: Text(
+                'Create Account',
+                style: TextStyle(
                   color: Color(0xff3967D6),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.elliptical(500, 300),
-                    bottomRight: Radius.elliptical(520, 300),
-                  ),
-                ),
-                height: 200,
-              ),
-              SizedBox(
-                height: 80,
-              ),
-              Container(
-                alignment: Alignment.center,
-                child: Text(
-                  'Create Account',
-                  style: TextStyle(
-                    color: Color(0xff3967D6),
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'OpenSans',
-                  ),
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'OpenSans',
                 ),
               ),
-              SizedBox(
-                height: 25,
-              ),
-              _buildName('first name'),
-              SizedBox(height: 20),
-              _buildName('last name'),
-              SizedBox(height: 20),
-              _buildEmailTF(),
-              SizedBox(height: 20),
-              _buildPasswordTF('Enter'),
-              SizedBox(height: 20),
-              _buildPasswordTF('Confirm'),
-              SizedBox(
-                height: 40,
-              ),
-              _buildSignupBtn(),
-              _buildLoginBtn(),
-            ],
-          ),
+            ),
+            SizedBox(
+              height: 25,
+            ),
+            _buildName('first name'),
+            SizedBox(height: 20),
+            _buildName('last name'),
+            SizedBox(height: 20),
+            _buildEmailTF(),
+            SizedBox(height: 20),
+            _buildPasswordTF('Enter'),
+            SizedBox(height: 20),
+            _buildPasswordTF('Confirm'),
+            SizedBox(
+              height: 40,
+            ),
+            _buildSignupBtn(),
+            _buildLoginBtn(),
+          ],
         ),
       ),
     );
@@ -77,14 +116,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
       margin: EdgeInsets.symmetric(horizontal: 40),
       decoration: kBoxDecorationStyle,
       child: TextField(
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.only(top: 14),
-          prefixIcon: Icon(Icons.person, color: Color(0xff3967D6)),
-          hintText: 'Enter your $label',
-          hintStyle: kHintTextStyle,
-        ),
-      ),
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.only(top: 14),
+            prefixIcon: Icon(Icons.person, color: Color(0xff3967D6)),
+            hintText: 'Enter your $label',
+            hintStyle: kHintTextStyle,
+          ),
+          controller: label == 'first name'
+              ? _firstNameController
+              : _lastNameController),
     );
   }
 
@@ -100,6 +141,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           hintText: 'Enter your email',
           hintStyle: kHintTextStyle,
         ),
+        controller: _emailController,
       ),
     );
   }
@@ -129,6 +171,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             },
           ),
         ),
+        controller:
+            label == 'Enter' ? _passwordController : _confirmPasswordController,
       ),
     );
   }
@@ -147,7 +191,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ),
         color: Color(0xff3967D6),
-        onPressed: () => print('signup pressed'),
+        onPressed: () {
+          BlocProvider.of<AuthBloc>(context).add(SignUp(
+              _firstNameController.text,
+              _lastNameController.text,
+              _emailController.text,
+              _passwordController.text,
+              _confirmPasswordController.text));
+        },
         child: Text(
           'SIGNUP',
           style: TextStyle(

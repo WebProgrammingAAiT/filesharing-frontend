@@ -17,12 +17,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Stream<AuthState> mapEventToState(
     AuthEvent event,
   ) async* {
+    if (event is SignUp) {
+      try {
+        yield AuthLoading();
+        var user = await authRepository.signUp(event.firstName, event.lastName,
+            event.email, event.password, event.confirmPassword);
+        if (user != null) {
+          yield AuthLoaded(user);
+        } else {
+          yield AuthError('Invalid credentials...');
+        }
+      } catch (e) {
+        yield AuthError(e.toString() ?? 'An unknown error occured');
+      }
+    }
     if (event is SignIn) {
       try {
         yield AuthLoading();
         var user = await authRepository.signIn(event.email, event.password);
         if (user != null) {
-          if (user.role == 'admin') {
+          if (user.role.name == 'admin') {
             yield AuthAdminLoaded(user);
           } else {
             yield AuthLoaded(user);
