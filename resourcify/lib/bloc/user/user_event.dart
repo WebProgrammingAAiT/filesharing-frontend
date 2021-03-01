@@ -38,9 +38,8 @@ class GetUserResources extends UserEvent {
 }
 
 class UpdateUserResource extends UserEvent {
-  final String name;
-  final String id;
-  UpdateUserResource(this.id, this.name);
+  final Resource resource;
+  UpdateUserResource(this.resource);
 }
 
 class DeleteUserResource extends UserEvent {
